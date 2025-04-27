@@ -8,39 +8,29 @@
 #include "HashTable.h"
 
 
-
-inline uint32_t HashPosition(const Vector3f& position)
+static inline uint32_t HashPosition(const Vector3f& position)
 {
-    union
+    auto ToUint = [](float f)
     {
-        float  f;
-        uint32_t i;
-    } x;
-    union
-    {
-        float  f;
-        uint32_t i;
-    } y;
-    union
-    {
-        float  f;
-        uint32_t i;
-    } z;
+        union
+        {
+            float    f;
+            uint32_t i;
+        } u = {f};
+        return f == 0.0 ? 0u : u.i; // 兼容-0.0，确保零值哈希一致
+    };
 
-    x.f = position.x;
-    y.f = position.y;
-    z.f = position.z;
-
-    return Murmur32({position.x == 0.0f ? 0u : x.i, position.y == 0.0f ? 0u : y.i, position.z == 0.0f ? 0u : z.i});
+    // 将位置的三个浮点数坐标映射到一维哈希key
+    return Murmur32({ToUint(position.x), ToUint(position.y), ToUint(position.z)});
 }
 
-inline uint32_t FloorLog2(uint32_t value)
+static inline uint32_t FloorLog2(uint32_t value)
 {
     unsigned long bitIndex;
     return _BitScanReverse(&bitIndex, value) ? bitIndex : 0;
 }
 
-inline uint32_t Cycle3(uint32_t value)
+static inline uint32_t Cycle3(uint32_t value)
 {
     uint32_t valueMod3 = value % 3;
     uint32_t nextValueMod3 = (1 << valueMod3) & 3;
@@ -58,9 +48,12 @@ struct EdgeHash
         const Vector3f position0 = GetPosition(edgeIndex);
         const Vector3f position1 = GetPosition(Cycle3(edgeIndex));
 
+        // 将两个顶点的坐标分别映射为一维的哈希值
         uint32_t hash0 = HashPosition(position0);
         uint32_t hash1 = HashPosition(position1);
-        uint32_t hash0 = HashPosition(position0);
+
+        // 继续映射为一个哈希值
+        uint32_t hash = Murmur32({hash0, hash1});
     }
 };
 
