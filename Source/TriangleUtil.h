@@ -147,22 +147,22 @@ struct Adjacency
 
     // 遍历指定边的所有邻接边，并对每个邻接对应用给定函数
     template <typename FuncType>
-    void ForAll(int32_t EdgeIndex, FuncType&& Function) const
+    void ForAll(int32_t edgeIndex, FuncType&& Function) const
     {
         // 首先检查Direct数组中的直接邻接
-        int32_t AdjIndex = Direct[EdgeIndex];
-        if (AdjIndex >= 0)
+        int32_t adjIndex = Direct[edgeIndex];
+        if (adjIndex >= 0)
         {
             // 对直接邻接应用函数
-            Function(EdgeIndex, AdjIndex);
+            Function(edgeIndex, adjIndex);
         }
 
         // 然后检查Extended中的所有邻接
-        auto range = Extended.equal_range(EdgeIndex);
+        auto range = Extended.equal_range(edgeIndex);
         for (auto& it = range.first; it != range.second; ++it)
         {
             // 对每个额外邻接应用函数
-            Function(EdgeIndex, it->second);
+            Function(edgeIndex, it->second);
         }
     }
 };
