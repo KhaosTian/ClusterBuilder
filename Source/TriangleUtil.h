@@ -34,8 +34,8 @@ static inline uint32_t Cycle3(uint32_t value)
 
 struct EdgeHash
 {
-    std::map<int32_t, int32_t> HashTable{};
-    EdgeHash(uint32_t num) : HashTable{{1 << std::bit_floor(num), num}} {}
+    HashTable Hash2EdgeIndex{};
+    EdgeHash(uint32_t num) : Hash2EdgeIndex{1 << std::bit_floor(num), num} {}
 
     template <typename FuncType>
     void AddConcurrent(int32_t edgeIndex, FuncType&& GetPosition)
@@ -50,10 +50,11 @@ struct EdgeHash
 
         // 继续将二者的哈希值映射为一个哈希值
         uint32_t hash = Murmur32({hash0, hash1});
-    }
 
-    void AddConcurrent(uint32_t key, uint32_t index) {}
-}
+        // 将哈希值映射到边索引
+        Hash2EdgeIndex.AddConcurrent(hash, edgeIndex);
+    }
+};
 
 struct Adjacency
 {
@@ -77,7 +78,7 @@ struct Adjacency
         bool found = false;
 
         // 检查是否已存在相同的键值对
-        for (auto it = range.first; it != range.second; ++it)
+        for (auto& it = range.first; it != range.second; ++it)
         {
             if (it->second == value)
             {
