@@ -24,12 +24,6 @@ static inline uint32_t HashPosition(const Vector3f& position)
     return Murmur32({ToUint(position.x), ToUint(position.y), ToUint(position.z)});
 }
 
-static inline uint32_t FloorLog2(uint32_t value)
-{
-    unsigned long bitIndex;
-    return _BitScanReverse(&bitIndex, value) ? bitIndex : 0;
-}
-
 static inline uint32_t Cycle3(uint32_t value)
 {
     uint32_t valueMod3 = value % 3;
@@ -37,14 +31,16 @@ static inline uint32_t Cycle3(uint32_t value)
     return value - valueMod3 + nextValueMod3;
 }
 
+
 struct EdgeHash
 {
-    std::unordered_map<int32_t, int32_t> HashTable{};
-    EdgeHash(int32_t num) { HashTable.emplace(1 << FloorLog2(num), num); }
+    std::map<int32_t, int32_t> HashTable{};
+    EdgeHash(uint32_t num) : HashTable{{1 << std::bit_floor(num), num}} {}
 
     template <typename FuncType>
     void AddConcurrent(int32_t edgeIndex, FuncType&& GetPosition)
     {
+        // 根据边索引获取坐标和其相邻坐标
         const Vector3f position0 = GetPosition(edgeIndex);
         const Vector3f position1 = GetPosition(Cycle3(edgeIndex));
 
@@ -52,10 +48,12 @@ struct EdgeHash
         uint32_t hash0 = HashPosition(position0);
         uint32_t hash1 = HashPosition(position1);
 
-        // 继续映射为一个哈希值
+        // 继续将二者的哈希值映射为一个哈希值
         uint32_t hash = Murmur32({hash0, hash1});
     }
-};
+
+    void AddConcurrent(uint32_t key, uint32_t index) {}
+}
 
 struct Adjacency
 {
