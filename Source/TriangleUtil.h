@@ -54,6 +54,38 @@ struct EdgeHash
         // 将哈希值映射到边索引
         Hash2EdgeIndex.AddConcurrent(hash, edgeIndex);
     }
+
+    template <typename FuncType1, typename FuncType2>
+    void ForAllMatching(int32_t edgeIndex, bool bAdd, FuncType1&& GetPosition, FuncType2&& Function)
+    {
+        // 根据边索引获取坐标和其相邻坐标
+        const Vector3f position0 = GetPosition(edgeIndex);
+        const Vector3f position1 = GetPosition(Cycle3(edgeIndex));
+
+        // 将两个顶点的坐标分别映射为一维的哈希值
+        uint32_t hash0 = HashPosition(position0);
+        uint32_t hash1 = HashPosition(position1);
+
+        // 继续将二者的哈希值映射为一个哈希值
+        uint32_t hash = Murmur32({hash0, hash1});
+
+        // 从头节点开始遍历该哈希桶所有边
+        for (uint32_t otherEdgeIndex = Hash2EdgeIndex.First(hash); Hash2EdgeIndex.IsValid(otherEdgeIndex);
+             otherEdgeIndex = Hash2EdgeIndex.Next(otherEdgeIndex))
+        {
+            // 匹配和当前边共享顶点但是方向相反的边，即两个三角形共享一条边
+            if (position0 == GetPosition(Cycle3(otherEdgeIndex)) && position1 == GetPosition(otherEdgeIndex))
+            {
+                Function(edgeIndex, otherEdgeIndex);
+            }
+        }
+
+        // 如果有需要就加入到哈希表中
+        if (bAdd)
+        {
+            Hash2EdgeIndex.Add(Murmur32({hash1, hash0}), edgeIndex);
+        }
+    }
 };
 
 struct Adjacency
