@@ -160,7 +160,18 @@ FORCEINLINE void HashTable::Free() {
     }
 }
 
-FORCEINLINE void HashTable::Resize(uint32_t newIndexSize) {
+FORCEINLINE void HashTable::Resize(uint32_t new_index_size) {
+    if (new_index_size == m_index_size) return;
+    if (new_index_size == 0 || m_index_size == 0) return;
+    
+    uint32_t* new_nex_index = new uint32_t[new_index_size];
+    if (m_next_index) {
+        std::memcpy(new_nex_index, m_next_index, m_index_size * sizeof(uint32_t));
+        delete[] m_next_index;
+    }
+
+    m_index_size = new_index_size;
+    m_next_index = new_nex_index;
 }
 
 // 返回key对应的链表的第一个索引
