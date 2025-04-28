@@ -216,5 +216,6 @@
     <None Include="External\UTemplate\details\Util.inl">
       <Filter>头文件</Filter>
     </None>
+    <None Include=".clang-format" />
   </ItemGroup>
 </Project>

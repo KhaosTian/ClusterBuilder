@@ -157,6 +157,7 @@
     <ClInclude Include="Source\VectorMath.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".clang-format" />
     <None Include=".gitignore" />
     <None Include="External\UTemplate\details\Func.inl" />
     <None Include="External\UTemplate\details\Name.inl" />
