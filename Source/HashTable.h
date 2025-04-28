@@ -29,7 +29,7 @@ static inline uint32_t Murmur32(std::initializer_list<uint32_t> init_list) {
 // 基于开放寻址法的哈希表
 class HashTable {
 public:
-    HashTable(uint32_t hash_size = 1024, uint32_t index_size = 0);
+    HashTable(uint32_t HashSize = 1024, uint32_t IndexSize = 0);
     HashTable(const HashTable& other);
     HashTable(HashTable&& other) noexcept;
     HashTable& operator=(const HashTable& other);
@@ -40,8 +40,8 @@ public:
 
     void     Resize(uint32_t new_index_size);
 
-    uint32_t index_size() const { return m_index_size; }
-    uint32_t hash_size() const { return m_hash_size; }
+    uint32_t IndexSize() const { return m_index_size; }
+    uint32_t HashSize() const { return m_hash_size; }
 
     uint32_t First(uint32_t key) const;
     uint32_t Next(uint32_t index) const;
