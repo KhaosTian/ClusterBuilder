@@ -134,7 +134,7 @@ void HashTable::Add(uint32_t key, uint32_t index)
     if (index >= m_IndexSize)
     {
         // 新容量取32和(index+1)向上取整到2的幂中的较大值
-        Resize(std::max<uint32_t>(32u, index + 1 <= 1 ? 1u : std::bit_ceil(static_cast<uint32_t>(index + 1))));
+        Resize(std::max<uint32_t>(32u, ((index + 1) <= 1) ? 1u : std::bit_ceil(static_cast<uint32_t>(index + 1))));
     }
 
     // 等价于 key % m_HashSize

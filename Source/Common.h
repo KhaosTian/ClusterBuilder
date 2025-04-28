@@ -15,6 +15,8 @@
 #define DEBUG_BREAK() raise(SIGTRAP)
 #endif
 
+#define FORCEINLINE __forceinline
+
 using ErrorHandler = void (*)(const char*, const char*, int, const char*);
 
 static void DefaultErrorHandler(const char* expr, const char* file, int line, const char* msg = nullptr)

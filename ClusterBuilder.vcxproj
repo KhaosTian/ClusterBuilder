@@ -91,6 +91,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\Cluster.cpp" />
+    <ClCompile Include="Source\HashTable.cpp" />
     <ClCompile Include="Source\main.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
@@ -142,7 +143,9 @@
     <ClInclude Include="External\UTemplate\Type.hpp" />
     <ClInclude Include="External\UTemplate\TypeList.hpp" />
     <ClInclude Include="External\UTemplate\Util.hpp" />
+    <ClInclude Include="Source\DisjointSet.h" />
     <ClInclude Include="Source\HashTable.h" />
+    <ClInclude Include="Source\Parallel.h" />
     <ClInclude Include="Source\TriangleUtil.h" />
     <ClInclude Include="Source\Cluster.h" />
     <ClInclude Include="Source\Common.h" />
