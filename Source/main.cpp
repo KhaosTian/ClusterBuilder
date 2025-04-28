@@ -20,7 +20,7 @@ static void ClusterTriangles(Vert& verts, const std::vector<uint32_t>& indexes, 
     uint32_t numTriangles = indexes.size() / 3;
 
     Adjacency adjacency{indexes.size()};
-    EdgeHash  edgeHash(indexes.size());
+    EdgeHash  edgeHash{indexes.size()};
 
     auto GetPosition = [&verts, &indexes](uint32_t edgeIndex) { return verts.Positions[indexes[edgeIndex]]; };
 

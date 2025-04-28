@@ -6,7 +6,7 @@
 #include <utility>
 #include <vector>
 #include "HashTable.h"
-
+#include "VectorMath.h"
 
 static inline uint32_t HashPosition(const Vector3f& position)
 {
