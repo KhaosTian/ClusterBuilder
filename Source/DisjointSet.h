@@ -23,7 +23,7 @@ FORCEINLINE DisjointSet::DisjointSet(uint32_t size) {
     Init(size);
 }
 
-// 每个三角形在初始化时都是独立的集合
+
 FORCEINLINE void DisjointSet::Init(uint32_t size) {
     m_parents.reserve(size);
     for (uint32_t i = 0; i < size; i++) {
@@ -46,7 +46,7 @@ FORCEINLINE void DisjointSet::AddDefaulted(uint32_t num) {
     }
 }
 
-// 合并共享边或顶点的三角形
+// 合并共享边或顶点的三角形，合并时遵循"索引大的合并索引小的"原则，使小索引三角形的父节点指向大索引三角形。
 FORCEINLINE void DisjointSet::Union(uint32_t x, uint32_t y) {
     // 获取x和y的根节点
     uint32_t px = m_parents[x];
@@ -86,7 +86,7 @@ FORCEINLINE void DisjointSet::UnionSequential(uint32_t x, uint32_t y) {
     uint32_t py = m_parents[y];
 
     while (px != py) {
-        // 索引较小的根合并到较大的根
+        // 索引较小的合并到较大的
         m_parents[y] = px;
         if (y == py) {
             return;
@@ -97,7 +97,7 @@ FORCEINLINE void DisjointSet::UnionSequential(uint32_t x, uint32_t y) {
     }
 }
 
-// 确定每个三角形所属的cluster根节点
+// 确定每个三角形所属的cluster根节点，根节点就是这个独立的拓扑结构最大的索引（最后一个三角形）
 FORCEINLINE uint32_t DisjointSet::Find(uint32_t i) {
     // 根据i查找其根节点，同时压缩路径上的所有节点
     uint32_t start = i; // 记录i的初始值

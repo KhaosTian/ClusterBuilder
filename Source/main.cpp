@@ -41,7 +41,7 @@ static void ClusterTriangles(Vert& verts, const std::vector<uint32_t>& indexes, 
 
     DisjointSet disjoint_set(num_triangles);
 
-    // 遍历所有边
+    // 遍历所有边，最终得到若干个互不连通的拓扑结构
     for (uint32_t edge_index = 0, num = indexes.size(); edge_index < num; edge_index++) {
         // 处理复杂边
         if (adjacency.direct[edge_index] == -2) {
@@ -62,6 +62,7 @@ static void ClusterTriangles(Vert& verts, const std::vector<uint32_t>& indexes, 
         adjacency.ForAll(edge_index, [&](int32_t edge_index0, int32_t edge_index1) {
             // 合并邻边三角形
             if (edge_index0 > edge_index1) {
+                // 随着连续合并操作，三角形间形成一条路径链，最大索引的三角形自然成为整个连通结构的终点
                 disjoint_set.UnionSequential(edge_index0 / 3, edge_index1 / 3);
             }
         });
