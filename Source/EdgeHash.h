@@ -48,6 +48,7 @@ FORCEINLINE void EdgeHash::AddConcurrent(int32_t edge_index, FuncType&& GetPosit
     hash_table.AddConcurrent(hash, edge_index);
 }
 
+// 匹配所有与自己共享顶点但是方向相反的边
 template<typename FuncType1, typename FuncType2>
 FORCEINLINE void EdgeHash::ForAllMatching(int32_t edge_index, bool need_add, FuncType1&& GetPosition, FuncType2&& Function) {
     // 根据边索引获取坐标和其相邻坐标

@@ -38,6 +38,34 @@ static void ClusterTriangles(Vert& verts, const std::vector<uint32_t>& indexes, 
 
         adjacency.direct[edge_index] = adj_index; // 记录直接邻边
     });
+
+    DisjointSet disjoint_set(num_triangles);
+
+    // 遍历所有边
+    for (uint32_t edge_index = 0, num = indexes.size(); edge_index < num; edge_index++) {
+        // 处理复杂边
+        if (adjacency.direct[edge_index] == -2) {
+            std::vector<std::pair<int32_t, int32_t>> edges;
+            // 收集所有匹配当前边的边
+            edge_hash.ForAllMatching(edge_index, false, GetPosition, [&](int32_t edge_index0, int32_t edge_index1) { edges.emplace_back(edge_index0, edge_index1); });
+
+            // 标准库排序保证确定性
+            std::sort(edges.begin(), edges.end());
+
+            // 建立邻接关系
+            for (const auto& edge: edges) {
+                adjacency.Link(edge.first, edge.second);
+            }
+        }
+
+        // 遍历当前边的邻接边
+        adjacency.ForAll(edge_index, [&](int32_t edge_index0, int32_t edge_index1) {
+            // 合并邻边三角形
+            if (edge_index0 > edge_index1) {
+                disjoint_set.UnionSequential(edge_index0 / 3, edge_index1 / 3);
+            }
+        });
+    }
 }
 
 int main() {
