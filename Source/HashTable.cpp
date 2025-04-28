@@ -1,29 +1,29 @@
 #include "HashTable.h"
 #include <bit>
 #include "Common.h"
- 
+
 HashTable::HashTable(uint32_t hashSize, uint32_t indexSize) :
     m_HashSize(hashSize), m_HashMask(0), m_IndexSize(indexSize), m_Hash(EmptyHash), m_NextIndex(nullptr)
 {
-    // È·±£¹şÏ£±íµÄ´óĞ¡´óÓÚ0ÇÒÊÇ2µÄÃİ´Î·½
+    // ç¡®ä¿å“ˆå¸Œè¡¨çš„å¤§å°å¤§äº0ä¸”æ˜¯2çš„å¹‚æ¬¡æ–¹
     CHECK(m_HashSize > 0);
     CHECK(std::has_single_bit(m_HashSize));
 
-    // ¶ÔÓÚ´óĞ¡Îª2µÄÃİ´Î·½µÄ¹şÏ£±í£¬x % m_HashSize µÈ¼ÛÓÚ x & (m_HashSize - 1)
+    // å¯¹äºå¤§å°ä¸º2çš„å¹‚æ¬¡æ–¹çš„å“ˆå¸Œè¡¨ï¼Œx % m_HashSize ç­‰ä»·äº x & (m_HashSize - 1)
     if (m_IndexSize)
     {
         m_HashMask = m_HashSize - 1;
-        // ·ÖÅä¹şÏ£Í°µÄÍ·Ë÷ÒıºÍÁ´±í
+        // åˆ†é…å“ˆå¸Œæ¡¶çš„å¤´ç´¢å¼•å’Œé“¾è¡¨
         m_Hash = new uint32_t[m_IndexSize];
         m_NextIndex = new uint32_t[m_IndexSize];
-        // ³õÊ¼»¯Êı×éÔªËØÎª0xff
+        // åˆå§‹åŒ–æ•°ç»„å…ƒç´ ä¸º0xff
         std::memset(m_Hash, 0xff, m_HashSize * sizeof(uint32_t));
     }
 }
 
 HashTable::HashTable(const HashTable& other) :
     m_HashSize(other.m_HashSize), m_HashMask(other.m_HashMask), m_IndexSize(other.m_IndexSize),
-    m_Hash(EmptyHash) // ÈÃÎ´³õÊ¼»¯»òÒÑÊÍ·ÅµÄ¹şÏ£±íÒ²ÄÜ°²È«ÏìÓ¦
+    m_Hash(EmptyHash) // è®©æœªåˆå§‹åŒ–æˆ–å·²é‡Šæ”¾çš„å“ˆå¸Œè¡¨ä¹Ÿèƒ½å®‰å…¨å“åº”
 
 {
     if (m_IndexSize)
@@ -31,7 +31,7 @@ HashTable::HashTable(const HashTable& other) :
         m_Hash = new uint32_t[m_HashSize];
         m_NextIndex = new uint32_t[m_IndexSize];
 
-        // ¿½±´ÄÚ´æ
+        // æ‹·è´å†…å­˜
         std::memcmp(m_Hash, other.m_Hash, m_HashSize * sizeof(uint32_t));
         std::memcmp(m_NextIndex, other.m_NextIndex, m_IndexSize * sizeof(uint32_t));
     }
@@ -49,7 +49,8 @@ HashTable::HashTable(HashTable&& other) noexcept :
 }
 
 HashTable& HashTable::operator=(const HashTable& other)
-{ Free();
+{
+    Free();
     m_HashSize = other.m_HashSize;
     m_HashMask = other.m_HashMask;
     m_IndexSize = other.m_IndexSize;
@@ -59,7 +60,7 @@ HashTable& HashTable::operator=(const HashTable& other)
         m_Hash = new uint32_t[m_HashSize];
         m_NextIndex = new uint32_t[m_IndexSize];
 
-        // ¿½±´ÄÚ´æ
+        // æ‹·è´å†…å­˜
         std::memcmp(m_Hash, other.m_Hash, m_HashSize * sizeof(uint32_t));
         std::memcmp(m_NextIndex, other.m_NextIndex, m_IndexSize * sizeof(uint32_t));
     }
@@ -84,7 +85,7 @@ HashTable& HashTable::operator=(HashTable&& other)
 
 void HashTable::Clear()
 {
-    // ÇĞ¶Ï´ÓÍ°µ½Á´±íµÄ·ÃÎÊÈë¿Ú
+    // åˆ‡æ–­ä»æ¡¶åˆ°é“¾è¡¨çš„è®¿é—®å…¥å£
     if (m_IndexSize)
     {
         std::memset(m_Hash, 0xff, m_HashSize * sizeof(uint32_t));
@@ -108,41 +109,41 @@ void HashTable::Free()
 
 void HashTable::Resize(uint32_t newIndexSize) {}
 
-// ·µ»Økey¶ÔÓ¦µÄÁ´±íµÄµÚÒ»¸öË÷Òı
+// è¿”å›keyå¯¹åº”çš„é“¾è¡¨çš„ç¬¬ä¸€ä¸ªç´¢å¼•
 uint32_t HashTable::First(uint32_t key) const
 {
     key &= m_HashMask;
     return m_Hash[key];
 }
 
-// ·µ»ØÁ´±íµ±Ç°Ë÷ÒıºóµÄÏÂÒ»¸öË÷Òı
+// è¿”å›é“¾è¡¨å½“å‰ç´¢å¼•åçš„ä¸‹ä¸€ä¸ªç´¢å¼•
 uint32_t HashTable::Next(uint32_t index) const
 {
     CHECK(index < m_IndexSize);
-    // ±ÜÃâÁ´±í½Úµã×ÔÒıÓÃµ¼ÖÂµÄÎŞÏŞÑ­»·
+    // é¿å…é“¾è¡¨èŠ‚ç‚¹è‡ªå¼•ç”¨å¯¼è‡´çš„æ— é™å¾ªç¯
     CHECK(m_NextIndex[index] != index);
     return m_NextIndex[index];
 }
 
 bool HashTable::IsValid(uint32_t index) const { return index != ~0u; }
 
-// key¾ö¶¨ÔªËØ·ÅÈëÄÄ¸öÍ°£¬index¾ö¶¨Êı¾İÔÚÍâ²¿Êı×éÖĞµÄË÷ÒıÎ»ÖÃ£¬HashTable±¾Éí²»´æ´¢Êı¾İ£¬Ö»´æ´¢Ë÷Òı
+// keyå†³å®šå…ƒç´ æ”¾å…¥å“ªä¸ªæ¡¶ï¼Œindexå†³å®šæ•°æ®åœ¨å¤–éƒ¨æ•°ç»„ä¸­çš„ç´¢å¼•ä½ç½®ï¼ŒHashTableæœ¬èº«ä¸å­˜å‚¨æ•°æ®ï¼Œåªå­˜å‚¨ç´¢å¼•
 void HashTable::Add(uint32_t key, uint32_t index)
 {
-    // Èç¹ûÌá¹©µÄË÷Òı³¬³öµ±Ç°¹şÏ£±íÈİÁ¿£¬¶¯Ì¬À©Èİ
+    // å¦‚æœæä¾›çš„ç´¢å¼•è¶…å‡ºå½“å‰å“ˆå¸Œè¡¨å®¹é‡ï¼ŒåŠ¨æ€æ‰©å®¹
     if (index >= m_IndexSize)
     {
-        // ĞÂÈİÁ¿È¡32ºÍ(index+1)ÏòÉÏÈ¡Õûµ½2µÄÃİÖĞµÄ½Ï´óÖµ
+        // æ–°å®¹é‡å–32å’Œ(index+1)å‘ä¸Šå–æ•´åˆ°2çš„å¹‚ä¸­çš„è¾ƒå¤§å€¼
         Resize(std::max<uint32_t>(32u, index + 1 <= 1 ? 1u : std::bit_ceil(static_cast<uint32_t>(index + 1))));
     }
 
-    // µÈ¼ÛÓÚ key % m_HashSize
+    // ç­‰ä»·äº key % m_HashSize
     key &= m_HashMask;
 
-    // Ê¹ÓÃÍ·²å·¨´¦Àí¹şÏ£³åÍ»£¬¹¹½¨Á´±í
-    // m_Hash[key]´æ´¢µÄÊÇÍ·½ÚµãµÄË÷Òı
+    // ä½¿ç”¨å¤´æ’æ³•å¤„ç†å“ˆå¸Œå†²çªï¼Œæ„å»ºé“¾è¡¨
+    // m_Hash[key]å­˜å‚¨çš„æ˜¯å¤´èŠ‚ç‚¹çš„ç´¢å¼•
     m_NextIndex[index] = m_Hash[key];
-    // ¸üĞÂÁ´±íÍ·ÎªĞÂÌí¼ÓµÄÔªËØ£¬´Óm_Hash[key]¿ÉÒÔ·ÃÎÊµ½Õû¸öÁ´±íÉÏµÄËùÓĞÔªËØ:
+    // æ›´æ–°é“¾è¡¨å¤´ä¸ºæ–°æ·»åŠ çš„å…ƒç´ ï¼Œä»m_Hash[key]å¯ä»¥è®¿é—®åˆ°æ•´ä¸ªé“¾è¡¨ä¸Šçš„æ‰€æœ‰å…ƒç´ :
     m_Hash[key] = index;
 }
 
@@ -151,11 +152,11 @@ void HashTable::AddConcurrent(uint32_t key, uint32_t index)
     CHECK(index < m_IndexSize);
 
     key &= m_HashMask;
-    // Ê¹ÓÃÔ­×Ó½»»»²Ù×÷ÊµÏÖÏß³Ì°²È«µÄÍ·²å·¨
-    m_NextIndex[index] = std::atomic_exchange( // ½«Ò»¸öÔ­×Ó¶ÔÏóµÄÖµÌæ»»ÎªĞÂÖµ²¢·µ»ØÌæ»»Ç°µÄ¾ÉÖµ
-        reinterpret_cast<std::atomic<uint32_t>*>(&m_Hash[key]), //½«m_Hash[key]ÊÓÎªÔ­×Ó±äÁ¿
-        index // Ô­×ÓµØ¶ÁÈ¡m_Hash[key]µÄµ±Ç°Öµ£¬²¢½«ÆäÌæ»»ÎªĞÂµÄindex
-    ); // ½«Ô­Ê¼ÖµÉèÖÃÎªĞÂÔªËØµÄnextÖ¸Õë
+    // ä½¿ç”¨åŸå­äº¤æ¢æ“ä½œå®ç°çº¿ç¨‹å®‰å…¨çš„å¤´æ’æ³•
+    m_NextIndex[index] = std::atomic_exchange( // å°†ä¸€ä¸ªåŸå­å¯¹è±¡çš„å€¼æ›¿æ¢ä¸ºæ–°å€¼å¹¶è¿”å›æ›¿æ¢å‰çš„æ—§å€¼
+        reinterpret_cast<std::atomic<uint32_t>*>(&m_Hash[key]), // å°†m_Hash[key]è§†ä¸ºåŸå­å˜é‡
+        index // åŸå­åœ°è¯»å–m_Hash[key]çš„å½“å‰å€¼ï¼Œå¹¶å°†å…¶æ›¿æ¢ä¸ºæ–°çš„index
+    ); // å°†åŸå§‹å€¼è®¾ç½®ä¸ºæ–°å…ƒç´ çš„nextæŒ‡é’ˆ
 }
 
 void HashTable::Remove(uint32_t key, uint32_t index)
@@ -167,20 +168,20 @@ void HashTable::Remove(uint32_t key, uint32_t index)
 
     key &= m_HashMask;
 
-    // Èç¹ûindexÕıºÃÊÇ¸ÃkeyÍ°µÄÍ·½Úµã
+    // å¦‚æœindexæ­£å¥½æ˜¯è¯¥keyæ¡¶çš„å¤´èŠ‚ç‚¹
     if (m_Hash[key] == index)
     {
-        // ½«ºóÒ»¸ö½ÚµãÉèÎªÍ·½Úµã¼´¿É
-        m_Hash[key] = m_NextIndex[index]; 
+        // å°†åä¸€ä¸ªèŠ‚ç‚¹è®¾ä¸ºå¤´èŠ‚ç‚¹å³å¯
+        m_Hash[key] = m_NextIndex[index];
         return;
     }
 
-    // ´ÓÍ·½Úµã¿ªÊ¼±éÀú
+    // ä»å¤´èŠ‚ç‚¹å¼€å§‹éå†
     for (uint32_t i = m_Hash[key]; IsValid(i); i = m_NextIndex[i])
     {
-        if (m_NextIndex[i] == index) // ÕÒµ½¸Ã½Úµã
+        if (m_NextIndex[i] == index) // æ‰¾åˆ°è¯¥èŠ‚ç‚¹
         {
-            m_NextIndex[i] = m_NextIndex[index]; // Ö¸ÏòÏÂÏÂÒ»¸ö½Úµã¼´¿É
+            m_NextIndex[i] = m_NextIndex[index]; // æŒ‡å‘ä¸‹ä¸‹ä¸€ä¸ªèŠ‚ç‚¹å³å¯
             break;
         }
     }

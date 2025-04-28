@@ -1,4 +1,4 @@
-﻿#include <array>
+#include <array>
 #include <cassert>
 #include <cmath>
 #include <iostream>
@@ -32,7 +32,7 @@ static void ClusterTriangles(Vert& verts, const std::vector<uint32_t>& indexes, 
     ParallelFor("ClusterTriangles.ParalleFor", indexes.size(), 1024,
                 [&](int edgeIndex)
                 {
-                    int32_t adjIndex = -1;// -1表示没有邻接边
+                    int32_t adjIndex = -1; // -1表示没有邻接边
                     int32_t adjCount = 0;
 
                     // 遍历边的邻接边
@@ -45,7 +45,7 @@ static void ClusterTriangles(Vert& verts, const std::vector<uint32_t>& indexes, 
 
                     // 通常共边三角形的那条共边是一对方向相反的边互相邻接
                     if (adjCount > 1)
-                        adjIndex = -2;// 如果超过了1条邻接边，说明是个复杂连接
+                        adjIndex = -2; // 如果超过了1条邻接边，说明是个复杂连接
 
                     adjacency.Direct[edgeIndex] = adjIndex; // 记录直接邻边
                 });

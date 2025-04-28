@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <initializer_list>
- 
+
 static inline uint32_t MurmurFinalize32(uint32_t hash)
 {
     hash ^= hash >> 16;
@@ -29,7 +29,7 @@ static inline uint32_t Murmur32(std::initializer_list<uint32_t> initList)
     return MurmurFinalize32(hash);
 }
 
-// »ùÓÚ¿ª·ÅÑ°Ö··¨µÄ¹şÏ£±í
+// åŸºäºå¼€æ”¾å¯»å€æ³•çš„å“ˆå¸Œè¡¨
 class HashTable
 {
 public:
@@ -45,22 +45,22 @@ public:
     void     Resize(uint32_t newIndexSize);
     uint32_t GetIndexSize() const { return m_IndexSize; }
     uint32_t GetHashSize() const { return m_HashSize; }
-    
+
     uint32_t First(uint32_t key) const;
     uint32_t Next(uint32_t index) const;
     bool     IsValid(uint32_t index) const;
 
-    void     Add(uint32_t key, uint32_t index);
-    void     AddConcurrent(uint32_t key, uint32_t index);
-    void     Remove(uint32_t key, uint32_t index);
+    void Add(uint32_t key, uint32_t index);
+    void AddConcurrent(uint32_t key, uint32_t index);
+    void Remove(uint32_t key, uint32_t index);
 
 protected:
     uint32_t m_HashSize;
     uint32_t m_HashMask;
     uint32_t m_IndexSize;
 
-    uint32_t* m_Hash; // ¹şÏ£Êı×éÖĞ´æ´¢Ã¿¸öÍ°µÄÁ´±íÍ·½ÚµãË÷Òı
-    uint32_t* m_NextIndex; // ´æ´¢´Óindex¿ÉÒÔ´ïµ½µÄÏÂÒ»¸öË÷Òı
+    uint32_t* m_Hash; // å“ˆå¸Œæ•°ç»„ä¸­å­˜å‚¨æ¯ä¸ªæ¡¶çš„é“¾è¡¨å¤´èŠ‚ç‚¹ç´¢å¼•
+    uint32_t* m_NextIndex; // å­˜å‚¨ä»indexå¯ä»¥è¾¾åˆ°çš„ä¸‹ä¸€ä¸ªç´¢å¼•
 
     static uint32_t EmptyHash[1];
 };

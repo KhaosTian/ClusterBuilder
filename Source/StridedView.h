@@ -18,7 +18,8 @@ public:
 
     StridedView() = default;
 
-    template <typename OtherElementType, typename = std::enable_if_t<std::is_convertible<OtherElementType*, ElementType*>::value>>
+    template <typename OtherElementType,
+              typename = std::enable_if_t<std::is_convertible<OtherElementType*, ElementType*>::value>>
     StridedView(SizeType bytesBetweenElements, OtherElementType* firstElementPtr, SizeType numElements) :
         m_FirstElementPtr(firstElementPtr), m_BytesBetweenElements(bytesBetweenElements), m_NumElements(numElements)
     {
@@ -27,7 +28,8 @@ public:
         assert(m_BytesBetweenElements % alignof(ElementType) == 0 && "Stride must respect element alignment");
     }
 
-    template <typename OtherElementType, typename = std::enable_if_t<std::is_convertible<OtherElementType*, ElementType*>::value>>
+    template <typename OtherElementType,
+              typename = std::enable_if_t<std::is_convertible<OtherElementType*, ElementType*>::value>>
     StridedView(const StridedView<OtherElementType, SizeType>& other) :
         m_FirstElementPtr(nullptr), m_BytesBetweenElements(other.GetStride()), m_NumElements(other.Num())
     {
@@ -40,8 +42,8 @@ public:
     bool IsValidIndex(SizeType index) const { return (index >= 0) && (index < m_NumElements); }
     bool IsEmpty() const { return m_NumElements == 0; }
 
-    SizeType Num() const { return m_NumElements; }
-    SizeType GetStride() const { return m_BytesBetweenElements; }
+    SizeType     Num() const { return m_NumElements; }
+    SizeType     GetStride() const { return m_BytesBetweenElements; }
     ElementType& GetUnsafe(SizeType index) const { return *GetElementPtrUnsafe(index); }
 
     ElementType& operator[](SizeType index) const
@@ -53,7 +55,6 @@ public:
     class Iterator
     {
     public:
-
         Iterator(const StridedView* owner, SizeType index) : m_Owner(owner), m_Index(index) {}
 
         Iterator& operator++()
@@ -76,15 +77,17 @@ public:
     Iterator end() const { return Iterator(this, m_NumElements); }
 
 private:
-
-    void RangeCheck(SizeType index) const { assert((index >= 0) && (index < m_NumElements) && "Array index out of bounds"); }
+    void RangeCheck(SizeType index) const
+    {
+        assert((index >= 0) && (index < m_NumElements) && "Array index out of bounds");
+    }
 
     ElementType* GetElementPtrUnsafe(SizeType index) const
     {
         using ByteType = typename std::conditional<std::is_const<ElementType>::value, const uint8_t, uint8_t>::type;
-        ByteType* asBytes = reinterpret_cast<ByteType*>(m_FirstElementPtr);
-        ElementType* asElement =
-            reinterpret_cast<ElementType*>(asBytes + static_cast<std::size_t>(index) * static_cast<std::size_t>(m_BytesBetweenElements));
+        ByteType*    asBytes = reinterpret_cast<ByteType*>(m_FirstElementPtr);
+        ElementType* asElement = reinterpret_cast<ElementType*>(
+            asBytes + static_cast<std::size_t>(index) * static_cast<std::size_t>(m_BytesBetweenElements));
         return asElement;
     }
 
@@ -102,7 +105,7 @@ StridedView<ElementType> MakeStridedView(int bytesBetweenElements, ElementType* 
 }
 
 template <typename ContainerType, typename ElementType, typename StructType>
-StridedView<ElementType> MakeStridedView(ContainerType& container, ElementType StructType::* member)
+StridedView<ElementType> MakeStridedView(ContainerType& container, ElementType StructType::*member)
 {
     if (container.size() == 0)
     {
@@ -113,7 +116,8 @@ StridedView<ElementType> MakeStridedView(ContainerType& container, ElementType S
 }
 
 template <typename ContainerType>
-auto MakeStridedView(ContainerType& container) -> StridedView<typename std::remove_reference<decltype(container[0])>::type>
+auto MakeStridedView(ContainerType& container)
+    -> StridedView<typename std::remove_reference<decltype(container[0])>::type>
 {
     using ElementType = typename std::remove_reference<decltype(container[0])>::type;
     if (container.size() == 0)
@@ -125,13 +129,14 @@ auto MakeStridedView(ContainerType& container) -> StridedView<typename std::remo
 
 // for const strided view
 template <typename ElementType>
-StridedView<const ElementType> MakeConstStridedView(int bytesBetweenElements, const ElementType* firstElement, int count)
+StridedView<const ElementType> MakeConstStridedView(int bytesBetweenElements, const ElementType* firstElement,
+                                                    int count)
 {
     return StridedView<const ElementType>(bytesBetweenElements, firstElement, count);
 }
 
 template <typename ContainerType, typename ElementType, typename StructType>
-ConstStridedView<ElementType> MakeConstStridedView(ContainerType& container, const ElementType StructType::* member)
+ConstStridedView<ElementType> MakeConstStridedView(ContainerType& container, const ElementType StructType::*member)
 {
     if (container.size() == 0)
     {
@@ -142,7 +147,8 @@ ConstStridedView<ElementType> MakeConstStridedView(ContainerType& container, con
 }
 
 template <typename ContainerType>
-auto MakeConstStridedView(const ContainerType& container) -> ConstStridedView<typename std::remove_reference<decltype(container[0])>::type>
+auto MakeConstStridedView(const ContainerType& container)
+    -> ConstStridedView<typename std::remove_reference<decltype(container[0])>::type>
 {
     using ElementType = typename std::remove_reference<decltype(container[0])>::type;
     if (container.size() == 0)
