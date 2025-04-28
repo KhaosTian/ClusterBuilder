@@ -3,9 +3,7 @@
 #include "Common.h"
 #include "VectorMath.h"
 
-
-class Cluster
-{
+class Cluster {
 public:
     Cluster() {}
 
@@ -23,13 +21,13 @@ public:
     static const uint16_t ClusterSize = 128;
 
     uint32_t NumVerts = 0;
-    uint32_t NumTris = 0;
+    uint32_t NumTris  = 0;
 
     std::vector<float>    Verts;
     std::vector<uint32_t> Indexes;
     std::vector<int32_t>  MaterialIndexes;
 
     Bounds3f Bounds;
-    uint64_t GUID = 0;
+    uint64_t GUID     = 0;
     int32_t  MipLevel = 0;
 };

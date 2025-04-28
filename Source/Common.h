@@ -8,25 +8,23 @@
 #include <string>
 
 #if defined(_WIN32)
-#include <intrin.h>
-#define DEBUG_BREAK() __debugbreak()
+    #include <intrin.h>
+    #define DEBUG_BREAK() __debugbreak()
 #else
-#include <signal.h>
-#define DEBUG_BREAK() raise(SIGTRAP)
+    #include <signal.h>
+    #define DEBUG_BREAK() raise(SIGTRAP)
 #endif
 
 #define FORCEINLINE __forceinline
 
 using ErrorHandler = void (*)(const char*, const char*, int, const char*);
 
-static void DefaultErrorHandler(const char* expr, const char* file, int line, const char* msg = nullptr)
-{
+static void DefaultErrorHandler(const char* expr, const char* file, int line, const char* msg = nullptr) {
     std::fprintf(stderr, "Assertion Failed:\n");
     std::fprintf(stderr, "  Expression: %s\n", expr);
     std::fprintf(stderr, "  File:       %s\n", file);
     std::fprintf(stderr, "  Line:       %d\n", line);
-    if (msg)
-    {
+    if (msg) {
         std::fprintf(stderr, "  Message:    %s\n", msg);
     }
     std::fflush(stderr);
@@ -34,31 +32,23 @@ static void DefaultErrorHandler(const char* expr, const char* file, int line, co
 
 static ErrorHandler g_ErrorHandler = &DefaultErrorHandler;
 
-#define CHECK(expr)                                                                                                                                  \
-    do                                                                                                                                               \
-    {                                                                                                                                                \
-        if (!(expr))                                                                                                                                 \
-        {                                                                                                                                            \
-            if (g_ErrorHandler)                                                                                                                      \
-            {                                                                                                                                        \
-                g_ErrorHandler(#expr, __FILE__, __LINE__, nullptr);                                                                                  \
-            }                                                                                                                                        \
-            DEBUG_BREAK();                                                                                                                           \
-            std::abort();                                                                                                                            \
-        }                                                                                                                                            \
-    }                                                                                                                                                \
-    while (0)
-#define CHECK_MSG(expr, msg)                                                                                                                         \
-    do                                                                                                                                               \
-    {                                                                                                                                                \
-        if (!(expr))                                                                                                                                 \
-        {                                                                                                                                            \
-            if (g_ErrorHandler)                                                                                                                      \
-            {                                                                                                                                        \
-                g_ErrorHandler(#expr, __FILE__, __LINE__, msg);                                                                                      \
-            }                                                                                                                                        \
-            DEBUG_BREAK();                                                                                                                           \
-            std::abort();                                                                                                                            \
-        }                                                                                                                                            \
-    }                                                                                                                                                \
-    while (0)
+#define CHECK(expr) \
+    do { \
+        if (!(expr)) { \
+            if (g_ErrorHandler) { \
+                g_ErrorHandler(#expr, __FILE__, __LINE__, nullptr); \
+            } \
+            DEBUG_BREAK(); \
+            std::abort(); \
+        } \
+    } while (0)
+#define CHECK_MSG(expr, msg) \
+    do { \
+        if (!(expr)) { \
+            if (g_ErrorHandler) { \
+                g_ErrorHandler(#expr, __FILE__, __LINE__, msg); \
+            } \
+            DEBUG_BREAK(); \
+            std::abort(); \
+        } \
+    } while (0)
