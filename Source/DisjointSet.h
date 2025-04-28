@@ -1,9 +1,5 @@
 #pragma once
 
-#include <vector>
-
-#include "Common.h"
-
 class DisjointSet {
 public:
     DisjointSet() {}

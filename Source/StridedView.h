@@ -1,9 +1,5 @@
 #pragma once
 
-#include <cassert>
-#include <cstdint>
-#include <type_traits>
-
 template<typename InElementType, typename InSizeType = int32_t>
 class StridedView;
 

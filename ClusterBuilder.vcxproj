@@ -61,7 +61,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)Source;$(ProjectDir)External</AdditionalIncludeDirectories>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -91,10 +91,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\Cluster.cpp" />
-    <ClCompile Include="Source\HashTable.cpp" />
     <ClCompile Include="Source\main.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Source\pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -143,12 +145,14 @@
     <ClInclude Include="External\UTemplate\Type.hpp" />
     <ClInclude Include="External\UTemplate\TypeList.hpp" />
     <ClInclude Include="External\UTemplate\Util.hpp" />
+    <ClInclude Include="Source\Adjacency.h" />
     <ClInclude Include="Source\DisjointSet.h" />
     <ClInclude Include="Source\HashTable.h" />
     <ClInclude Include="Source\Parallel.h" />
-    <ClInclude Include="Source\TriangleUtil.h" />
+    <ClInclude Include="Source\EdgeHash.h" />
     <ClInclude Include="Source\Cluster.h" />
     <ClInclude Include="Source\Common.h" />
+    <ClInclude Include="Source\pch.h" />
     <ClInclude Include="Source\StridedView.h" />
     <ClInclude Include="Source\VectorMath.h" />
   </ItemGroup>

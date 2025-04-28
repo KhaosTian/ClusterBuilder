@@ -1,7 +1,4 @@
 #pragma once
-#include <vector>
-#include "Common.h"
-#include "VectorMath.h"
 
 class Cluster {
 public:

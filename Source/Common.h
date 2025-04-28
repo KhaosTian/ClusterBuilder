@@ -1,11 +1,4 @@
 #pragma once
-#include <memory>
-#include <string>
-#include <vector>
-
-#include <cstdio>
-#include <cstdlib>
-#include <string>
 
 #if defined(_WIN32)
     #include <intrin.h>

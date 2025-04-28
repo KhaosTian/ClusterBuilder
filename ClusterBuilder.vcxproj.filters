@@ -21,7 +21,7 @@
     <ClCompile Include="Source\main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Source\HashTable.cpp">
+    <ClCompile Include="Source\pch.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -173,13 +173,19 @@
     <ClInclude Include="Source\StridedView.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Source\TriangleUtil.h">
+    <ClInclude Include="Source\EdgeHash.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Source\HashTable.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Source\Parallel.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Adjacency.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\pch.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Source\DisjointSet.h">
