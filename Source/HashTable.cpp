@@ -1,7 +1,7 @@
 #include "HashTable.h"
 #include <bit>
 #include "Common.h"
-
+ 
 HashTable::HashTable(uint32_t hashSize, uint32_t indexSize) :
     m_HashSize(hashSize), m_HashMask(0), m_IndexSize(indexSize), m_Hash(EmptyHash), m_NextIndex(nullptr)
 {

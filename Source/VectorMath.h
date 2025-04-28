@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "UGM/UGM.hpp"
-
+ 
 namespace Math
 {
 	using Point2i = Ubpa::pointi2;

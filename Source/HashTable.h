@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <initializer_list>
-
+ 
 static inline uint32_t MurmurFinalize32(uint32_t hash)
 {
     hash ^= hash >> 16;
