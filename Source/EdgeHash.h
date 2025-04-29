@@ -2,25 +2,6 @@
 
 #include "HashTable.h"
 
-FORCEINLINE static uint32_t HashPosition(const Vector3f& position) {
-    auto ToUint = [](float f) {
-        union {
-            float    f;
-            uint32_t i;
-        } u = { f };
-        return f == 0.0 ? 0u : u.i; // 兼容-0.0，确保零值哈希一致
-    };
-
-    // 将位置的三个浮点数坐标映射到一维哈希key
-    return Murmur32({ ToUint(position.x), ToUint(position.y), ToUint(position.z) });
-}
-
-FORCEINLINE static uint32_t Cycle3(uint32_t value) {
-    uint32_t value_mod3      = value % 3;
-    uint32_t next_value_mod3 = (1 << value_mod3) & 3;
-    return value - value_mod3 + next_value_mod3;
-}
-
 struct EdgeHash {
     HashTable hash_table {};
     EdgeHash(size_t num): hash_table { 1u << std::bit_floor(static_cast<uint32_t>(num)), static_cast<uint32_t>(num) } {}

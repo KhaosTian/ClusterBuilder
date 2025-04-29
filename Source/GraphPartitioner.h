@@ -55,5 +55,5 @@ public:
 };
 
 template<typename FuncType>
-inline void GraphPartitioner::BuildLocalityLinks(DisjointSet& disjoint_set, const Bounds3f& bounds, std::vector<int32_t>& group_indexes, FuncType& GetCenter) {
+FORCEINLINE void GraphPartitioner::BuildLocalityLinks(DisjointSet& disjoint_set, const Bounds3f& bounds, std::vector<int32_t>& group_indexes, FuncType& GetCenter) {
 }
