@@ -27,11 +27,11 @@ FORCEINLINE Adjacency::Adjacency(size_t num) {
 // 向Extended映射中添加键值对，确保不重复添加
 FORCEINLINE void Adjacency::AddUnique(int32_t key, int32_t value) {
     // 获取指定键的所有已存在值
-    auto range = extended.equal_range(key);
-    bool found = false;
+    auto [begin, end] = extended.equal_range(key);
+    bool found      = false;
 
     // 检查是否已存在相同的键值对
-    for (auto& it = range.first; it != range.second; ++it) {
+    for (auto& it = begin; it != end; ++it) {
         if (it->second == value) {
             found = true;
             break;
@@ -70,8 +70,8 @@ FORCEINLINE void Adjacency::ForAll(int32_t edge_index, FuncType&& Function) cons
     }
 
     // 然后检查Extended中的所有邻接
-    auto range = extended.equal_range(edge_index);
-    for (auto& it = range.first; it != range.second; ++it) {
+    auto [begin, end] = extended.equal_range(edge_index);
+    for (auto& it = begin; it != end; ++it) {
         // 对每个额外邻接应用函数
         Function(edge_index, it->second);
     }
