@@ -12,11 +12,11 @@ struct EdgeHash {
     void ForAllMatching(int32 edge_index, bool need_add, FuncType1&& GetPosition, FuncType2&& Function);
 };
 
-FORCEINLINE static uint32_t HashPosition(const Vector3f& position) {
+FORCEINLINE static uint32 HashPosition(const Vector3f& position) {
     auto ToUint = [](float f) {
         union {
             float    f;
-            uint32_t i;
+            uint32 i;
         } u = { f };
         return f == 0.0 ? 0u : u.i; // 兼容-0.0，确保零值哈希一致
     };
@@ -25,9 +25,9 @@ FORCEINLINE static uint32_t HashPosition(const Vector3f& position) {
     return Murmur32({ ToUint(position.x), ToUint(position.y), ToUint(position.z) });
 }
 
-FORCEINLINE static uint32_t Cycle3(uint32_t value) {
-    uint32_t value_mod3      = value % 3;
-    uint32_t next_value_mod3 = (1 << value_mod3) & 3;
+FORCEINLINE static uint32 Cycle3(uint32 value) {
+    uint32 value_mod3      = value % 3;
+    uint32 next_value_mod3 = (1 << value_mod3) & 3;
     return value - value_mod3 + next_value_mod3;
 }
 
