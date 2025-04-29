@@ -147,6 +147,7 @@
     <ClInclude Include="External\UTemplate\Util.hpp" />
     <ClInclude Include="Source\Adjacency.h" />
     <ClInclude Include="Source\DisjointSet.h" />
+    <ClInclude Include="Source\GraphPartitioner.h" />
     <ClInclude Include="Source\HashTable.h" />
     <ClInclude Include="Source\Parallel.h" />
     <ClInclude Include="Source\EdgeHash.h" />

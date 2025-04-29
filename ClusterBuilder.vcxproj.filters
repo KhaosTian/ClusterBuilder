@@ -191,6 +191,9 @@
     <ClInclude Include="Source\DisjointSet.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GraphPartitioner.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />

@@ -11,13 +11,13 @@
 #include <algorithm>
 #include <string>
 #include <bit>
+#include <type_traits>
 
 #include <vector>
 #include <map>
 #include <unordered_map>
 
-
-#include <type_traits>
+#include "metis.h"
 
 #include "VectorMath.h"
 #include "Common.h"

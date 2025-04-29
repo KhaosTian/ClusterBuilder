@@ -6,6 +6,7 @@
 #include "VectorMath.h"
 #include "Adjacency.h"
 #include "DisjointSet.h"
+#include "GraphPartitioner.h"
 
 struct Vert {
     std::vector<Vector3f> Positions;
