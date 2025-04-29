@@ -27,13 +27,13 @@ FORCEINLINE static uint32_t Murmur32(std::initializer_list<uint32_t> init_list) 
 // 基于开放寻址法的哈希表
 class HashTable {
 public:
-    HashTable(uint32_t HashSize = 1024, uint32_t IndexSize = 0);
+    HashTable(uint32_t hash_size = 1024, uint32_t index_size = 0);
     HashTable(const HashTable& other);
     HashTable(HashTable&& other) noexcept;
     HashTable& operator=(const HashTable& other);
     HashTable& operator=(HashTable&& other) noexcept;
 
-    void Clear();
+    void Clear() const;
     void Free();
 
     void Resize(uint32_t new_index_size);
@@ -46,8 +46,8 @@ public:
     bool     IsValid(uint32_t index) const;
 
     void Add(uint32_t key, uint32_t index);
-    void AddConcurrent(uint32_t key, uint32_t index);
-    void Remove(uint32_t key, uint32_t index);
+    void AddConcurrent(uint32_t key, uint32_t index) const;
+    void Remove(uint32_t key, uint32_t index) const;
 
 protected:
     uint32_t m_hash_size;
@@ -60,7 +60,7 @@ protected:
     static uint32_t EmptyHash[1];
 };
 
-FORCEINLINE HashTable::HashTable(uint32_t hashSize, uint32_t indexSize): m_hash_size(hashSize), m_hash_mask(0), m_index_size(indexSize), m_hash(EmptyHash), m_next_index(nullptr) {
+FORCEINLINE HashTable::HashTable(uint32_t hash_size, uint32_t index_size): m_hash_size(hash_size), m_hash_mask(0), m_index_size(index_size), m_hash(EmptyHash), m_next_index(nullptr) {
     // 确保哈希表的大小大于0且是2的幂次方
     CHECK(m_hash_size > 0);
     CHECK(std::has_single_bit(m_hash_size));
@@ -106,7 +106,12 @@ FORCEINLINE HashTable::HashTable(HashTable&& other) noexcept:
 }
 
 FORCEINLINE HashTable& HashTable::operator=(const HashTable& other) {
+    if (this == &other) {  // 显式处理自赋值
+        return *this;
+    }
+    
     Free();
+    
     m_hash_size  = other.m_hash_size;
     m_hash_mask  = other.m_hash_mask;
     m_index_size = other.m_index_size;
@@ -140,7 +145,7 @@ FORCEINLINE HashTable& HashTable::operator=(HashTable&& other) noexcept {
     return *this;
 }
 
-FORCEINLINE void HashTable::Clear() {
+FORCEINLINE void HashTable::Clear() const {
     // 切断从桶到链表的访问入口
     if (m_index_size) {
         std::memset(m_hash, 0xff, m_hash_size * sizeof(uint32_t));
@@ -210,7 +215,7 @@ FORCEINLINE void HashTable::Add(uint32_t key, uint32_t index) {
     m_hash[key] = index;
 }
 
-FORCEINLINE void HashTable::AddConcurrent(uint32_t key, uint32_t index) {
+FORCEINLINE void HashTable::AddConcurrent(uint32_t key, uint32_t index) const {
     CHECK(index < m_index_size);
 
     key &= m_hash_mask;
@@ -221,7 +226,7 @@ FORCEINLINE void HashTable::AddConcurrent(uint32_t key, uint32_t index) {
     ); // 将原始值设置为新元素的next指针
 }
 
-FORCEINLINE void HashTable::Remove(uint32_t key, uint32_t index) {
+FORCEINLINE void HashTable::Remove(uint32_t key, uint32_t index) const {
     if (index >= m_index_size) {
         return;
     }
