@@ -1,9 +1,9 @@
 #pragma once
 
-template<typename InElementType, typename InSizeType = int32_t>
+template<typename InElementType, typename InSizeType = int32>
 class StridedView;
 
-template<typename T, typename SizeType = int32_t>
+template<typename T, typename SizeType = int32>
 using ConstStridedView = StridedView<const T, SizeType>;
 
 template<typename ElementType, typename SizeType>
@@ -93,7 +93,7 @@ StridedView<ElementType> MakeStridedView(ContainerType& container, ElementType S
         return StridedView<ElementType>();
     }
     auto* data = &container[0];
-    return StridedView<ElementType>(sizeof(StructType), &(data->*member), static_cast<int32_t>(container.size()));
+    return StridedView<ElementType>(sizeof(StructType), &(data->*member), static_cast<int32>(container.size()));
 }
 
 template<typename ContainerType>
@@ -102,7 +102,7 @@ auto MakeStridedView(ContainerType& container) -> StridedView<std::remove_refere
     if (container.size() == 0) {
         return StridedView<ElementType>();
     }
-    return StridedView<ElementType>(sizeof(ElementType), &container[0], static_cast<int32_t>(container.size()));
+    return StridedView<ElementType>(sizeof(ElementType), &container[0], static_cast<int32>(container.size()));
 }
 
 // for const strided view
@@ -117,7 +117,7 @@ ConstStridedView<ElementType> MakeConstStridedView(ContainerType& container, con
         return ConstStridedView<ElementType>();
     }
     auto* data = &container[0];
-    return ConstStridedView<ElementType>(sizeof(StructType), &(data->*member), static_cast<int32_t>(container.size()));
+    return ConstStridedView<ElementType>(sizeof(StructType), &(data->*member), static_cast<int32>(container.size()));
 }
 
 template<typename ContainerType>
@@ -126,5 +126,5 @@ auto MakeConstStridedView(const ContainerType& container) -> ConstStridedView<st
     if (container.size() == 0) {
         return ConstStridedView<ElementType>();
     }
-    return ConstStridedView<ElementType>(sizeof(ElementType), &container[0], static_cast<int32_t>(container.size()));
+    return ConstStridedView<ElementType>(sizeof(ElementType), &container[0], static_cast<int32>(container.size()));
 }

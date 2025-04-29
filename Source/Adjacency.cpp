@@ -7,7 +7,7 @@ FORCEINLINE Adjacency::Adjacency(size_t num) {
 }
 
 // 向Extended映射中添加键值对，确保不重复添加
-FORCEINLINE void Adjacency::AddUnique(int32_t key, int32_t value) {
+FORCEINLINE void Adjacency::AddUnique(int32 key, int32 value) {
     // 获取指定键的所有已存在值
     auto [begin, end] = extended.equal_range(key);
     bool found        = false;
@@ -29,7 +29,7 @@ FORCEINLINE void Adjacency::AddUnique(int32_t key, int32_t value) {
 // 在两个边之间建立邻接连接
 // 如果两个边都没有直接邻接边，则使用Direct数组存储它们之间的关系。
 // 否则，使用Extended多重映射存储它们之间的关系。
-FORCEINLINE void Adjacency::Link(int32_t edge_index0, int32_t edge_index1) {
+FORCEINLINE void Adjacency::Link(int32 edge_index0, int32 edge_index1) {
     // 如果两个边都没有直接邻接边，使用Direct数组连接它们
     if (direct[edge_index0] < 0 && direct[edge_index1] < 0) {
         direct[edge_index0] = edge_index1;

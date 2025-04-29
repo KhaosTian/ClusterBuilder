@@ -12,24 +12,24 @@ struct Vert {
     std::vector<Vector3f> Positions;
 };
 
-static void ClusterTriangles(Vert& verts, const std::vector<uint32_t>& indexes, const std::vector<int32_t>& material_indexes, std::vector<Cluster>& clusters, const Bounds3f& mesh_bounds) {
-    uint32_t num_triangles = static_cast<uint32_t>(indexes.size() / 3);
+static void ClusterTriangles(Vert& verts, const std::vector<uint32>& indexes, const std::vector<int32>& material_indexes, std::vector<Cluster>& clusters, const Bounds3f& mesh_bounds) {
+    uint32 num_triangles = static_cast<uint32>(indexes.size() / 3);
 
     Adjacency adjacency { indexes.size() };
     EdgeHash  edge_hash { indexes.size() };
 
-    auto GetPosition = [&verts, &indexes](uint32_t edge_index) { return verts.Positions[indexes[edge_index]]; };
+    auto GetPosition = [&verts, &indexes](uint32 edge_index) { return verts.Positions[indexes[edge_index]]; };
 
     // 将每个索引视作一条边，构建边的哈希表
     ParallelFor("ClusterTriangles.ParalleFor", indexes.size(), 4096, [&](int edge_index) { edge_hash.AddConcurrent(edge_index, GetPosition); });
 
     // 将每个索引视作一条边，确定边的邻接关系
     ParallelFor("ClusterTriangles.ParalleFor", indexes.size(), 1024, [&](int edge_index) {
-        int32_t adj_index = -1; // -1表示没有邻接边
-        int32_t adj_count = 0;
+        int32 adj_index = -1; // -1表示没有邻接边
+        int32 adj_count = 0;
 
         // 遍历边的邻接边
-        edge_hash.ForAllMatching(edge_index, false, GetPosition, [&](int32_t edge_ndex, int32_t other_edge_index) {
+        edge_hash.ForAllMatching(edge_index, false, GetPosition, [&](int32 edge_ndex, int32 other_edge_index) {
             adj_index = other_edge_index; // 记录邻接边的索引
             adj_count++;
         });
@@ -43,12 +43,12 @@ static void ClusterTriangles(Vert& verts, const std::vector<uint32_t>& indexes, 
     DisjointSet disjoint_set(num_triangles);
 
     // 遍历所有边，最终得到若干个互不连通的拓扑结构
-    for (uint32_t edge_index = 0, num = indexes.size(); edge_index < num; edge_index++) {
+    for (uint32 edge_index = 0, num = indexes.size(); edge_index < num; edge_index++) {
         // 处理复杂边
         if (adjacency.direct[edge_index] == -2) {
-            std::vector<std::pair<int32_t, int32_t>> edges;
+            std::vector<std::pair<int32, int32>> edges;
             // 收集所有匹配当前边的边
-            edge_hash.ForAllMatching(edge_index, false, GetPosition, [&](int32_t edge_index0, int32_t edge_index1) { edges.emplace_back(edge_index0, edge_index1); });
+            edge_hash.ForAllMatching(edge_index, false, GetPosition, [&](int32 edge_index0, int32 edge_index1) { edges.emplace_back(edge_index0, edge_index1); });
 
             // 标准库排序保证确定性
             std::sort(edges.begin(), edges.end());
@@ -60,7 +60,7 @@ static void ClusterTriangles(Vert& verts, const std::vector<uint32_t>& indexes, 
         }
 
         // 遍历当前边的邻接边
-        adjacency.ForAll(edge_index, [&](int32_t edge_index0, int32_t edge_index1) {
+        adjacency.ForAll(edge_index, [&](int32 edge_index0, int32 edge_index1) {
             // 合并邻边三角形
             if (edge_index0 > edge_index1) {
                 // 随着连续合并操作，三角形间形成一条路径链，最大索引的三角形自然成为整个连通结构的终点
@@ -73,7 +73,7 @@ static void ClusterTriangles(Vert& verts, const std::vector<uint32_t>& indexes, 
     GraphPartitioner patitioner(num_triangles, Cluster::ClusterSize - 4, Cluster::ClusterSize);
     {
         // 获取三角形的中心坐标
-        auto GetCenter = [&verts, &indexes](uint32_t tri_index) { Vector3f center;
+        auto GetCenter = [&verts, &indexes](uint32 tri_index) { Vector3f center;
             center = verts.Positions[indexes[tri_index * 3 + 0]];
             center += verts.Positions[indexes[tri_index * 3 + 1]];
             center += verts.Positions[indexes[tri_index * 3 + 2]];

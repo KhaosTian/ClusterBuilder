@@ -4,26 +4,45 @@
 
 struct EdgeHash {
     HashTable hash_table {};
-    EdgeHash(size_t num): hash_table { 1u << std::bit_floor(static_cast<uint32_t>(num)), static_cast<uint32_t>(num) } {}
+    EdgeHash(size_t num): hash_table { 1u << std::bit_floor(static_cast<uint32>(num)), static_cast<uint32>(num) } {}
 
     template<typename FuncType>
-    void AddConcurrent(int32_t edge_index, FuncType&& GetPosition);
+    void AddConcurrent(int32 edge_index, FuncType&& GetPosition);
     template<typename FuncType1, typename FuncType2>
-    void ForAllMatching(int32_t edge_index, bool need_add, FuncType1&& GetPosition, FuncType2&& Function);
+    void ForAllMatching(int32 edge_index, bool need_add, FuncType1&& GetPosition, FuncType2&& Function);
 };
 
+FORCEINLINE static uint32_t HashPosition(const Vector3f& position) {
+    auto ToUint = [](float f) {
+        union {
+            float    f;
+            uint32_t i;
+        } u = { f };
+        return f == 0.0 ? 0u : u.i; // 兼容-0.0，确保零值哈希一致
+    };
+
+    // 将位置的三个浮点数坐标映射到一维哈希key
+    return Murmur32({ ToUint(position.x), ToUint(position.y), ToUint(position.z) });
+}
+
+FORCEINLINE static uint32_t Cycle3(uint32_t value) {
+    uint32_t value_mod3      = value % 3;
+    uint32_t next_value_mod3 = (1 << value_mod3) & 3;
+    return value - value_mod3 + next_value_mod3;
+}
+
 template<typename FuncType>
-FORCEINLINE void EdgeHash::AddConcurrent(int32_t edge_index, FuncType&& GetPosition) {
+FORCEINLINE void EdgeHash::AddConcurrent(int32 edge_index, FuncType&& GetPosition) {
     // 根据边索引获取坐标和其相邻坐标
     const Vector3f position0 = GetPosition(edge_index);
     const Vector3f position1 = GetPosition(Cycle3(edge_index));
 
     // 将两个顶点的坐标分别映射为一维的哈希值
-    uint32_t hash0 = HashPosition(position0);
-    uint32_t hash1 = HashPosition(position1);
+    uint32 hash0 = HashPosition(position0);
+    uint32 hash1 = HashPosition(position1);
 
     // 继续将二者的哈希值映射为一个哈希值
-    uint32_t hash = Murmur32({ hash0, hash1 });
+    uint32 hash = Murmur32({ hash0, hash1 });
 
     // 将哈希值映射到边索引
     hash_table.AddConcurrent(hash, edge_index);
@@ -31,20 +50,20 @@ FORCEINLINE void EdgeHash::AddConcurrent(int32_t edge_index, FuncType&& GetPosit
 
 // 匹配所有与自己共享顶点但是方向相反的边
 template<typename FuncType1, typename FuncType2>
-FORCEINLINE void EdgeHash::ForAllMatching(int32_t edge_index, bool need_add, FuncType1&& GetPosition, FuncType2&& Function) {
+FORCEINLINE void EdgeHash::ForAllMatching(int32 edge_index, bool need_add, FuncType1&& GetPosition, FuncType2&& Function) {
     // 根据边索引获取坐标和其相邻坐标
     const Vector3f position0 = GetPosition(edge_index);
     const Vector3f position1 = GetPosition(Cycle3(edge_index));
 
     // 将两个顶点的坐标分别映射为一维的哈希值
-    uint32_t hash0 = HashPosition(position0);
-    uint32_t hash1 = HashPosition(position1);
+    uint32 hash0 = HashPosition(position0);
+    uint32 hash1 = HashPosition(position1);
 
     // 继续将二者的哈希值映射为一个哈希值
-    uint32_t hash = Murmur32({ hash0, hash1 });
+    uint32 hash = Murmur32({ hash0, hash1 });
 
     // 从头节点开始遍历该哈希桶所有边
-    for (uint32_t other_edge_index = hash_table.First(hash); hash_table.IsValid(other_edge_index); other_edge_index = hash_table.Next(other_edge_index)) {
+    for (uint32 other_edge_index = hash_table.First(hash); hash_table.IsValid(other_edge_index); other_edge_index = hash_table.Next(other_edge_index)) {
         // 匹配和当前边共享顶点但是方向相反的边，即两个三角形共享一条边
         if (position0 == GetPosition(Cycle3(other_edge_index)) && position1 == GetPosition(other_edge_index)) {
             Function(edge_index, other_edge_index);

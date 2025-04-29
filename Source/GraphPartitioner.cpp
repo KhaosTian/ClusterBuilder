@@ -1,17 +1,17 @@
 #include "pch.h"
 #include "GraphPartitioner.h"
 
-FORCEINLINE GraphPartitioner::GraphPartitioner(uint32_t num_elements, int32_t min_partition_size, int32_t max_partition_size) {
+FORCEINLINE GraphPartitioner::GraphPartitioner(uint32 num_elements, int32 min_partition_size, int32 max_partition_size) {
 }
 
-FORCEINLINE GraphPartitioner::GraphData* GraphPartitioner::NewGraph(uint32_t num_adjacency) const {
+FORCEINLINE GraphPartitioner::GraphData* GraphPartitioner::NewGraph(uint32 num_adjacency) const {
     return nullptr;
 }
 
-FORCEINLINE void GraphPartitioner::AddAdjaceny(GraphData* graph, uint32_t adj_index, idx_t cost) {
+FORCEINLINE void GraphPartitioner::AddAdjaceny(GraphData* graph, uint32 adj_index, idx_t cost) {
 }
 
-FORCEINLINE void GraphPartitioner::AddLocalityLinks(GraphData* graph, uint32_t index, idx_t cost) {
+FORCEINLINE void GraphPartitioner::AddLocalityLinks(GraphData* graph, uint32 index, idx_t cost) {
 }
 
 FORCEINLINE void GraphPartitioner::Partition(GraphData* graph) {

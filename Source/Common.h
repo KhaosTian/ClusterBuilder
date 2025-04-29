@@ -1,12 +1,18 @@
 #pragma once
 
-
 #include <intrin.h>
 #define DEBUG_BREAK() __debugbreak()
 
 #define FORCEINLINE __forceinline
 
 #define RESTRICT __restrict
+
+using int16 = int16_t;
+using int32 = int32_t;
+using int64 = int64_t;
+using uint16 = uint16_t;
+using uint32 = uint32_t;
+using uint64 = uint64_t;
 
 using ErrorHandler = void (*)(const char*, const char*, int, const char*);
 
@@ -35,7 +41,7 @@ static ErrorHandler g_ErrorHandler = &DefaultErrorHandler;
     } while (0)
 
 
-FORCEINLINE static uint32_t MurmurFinalize32(uint32_t hash) {
+FORCEINLINE static uint32 MurmurFinalize32(uint32 hash) {
     hash ^= hash >> 16;
     hash *= 0x85ebca6b;
     hash ^= hash >> 13;
@@ -44,8 +50,8 @@ FORCEINLINE static uint32_t MurmurFinalize32(uint32_t hash) {
     return hash;
 }
 
-FORCEINLINE static uint32_t Murmur32(std::initializer_list<uint32_t> init_list) {
-    uint32_t hash = 0;
+FORCEINLINE static uint32 Murmur32(std::initializer_list<uint32> init_list) {
+    uint32 hash = 0;
     for (auto element: init_list) {
         element *= 0xcc9e2d51;
         element = (element << 15) | (element >> (32 - 15));

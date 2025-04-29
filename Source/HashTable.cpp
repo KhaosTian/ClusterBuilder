@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "HashTable.h"
 
-FORCEINLINE HashTable::HashTable(uint32_t hash_size, uint32_t index_size): m_hash_size(hash_size), m_hash_mask(0), m_index_size(index_size), m_hash(EmptyHash), m_next_index(nullptr) {
+FORCEINLINE HashTable::HashTable(uint32 hash_size, uint32 index_size): m_hash_size(hash_size), m_hash_mask(0), m_index_size(index_size), m_hash(EmptyHash), m_next_index(nullptr) {
     // 确保哈希表的大小大于0且是2的幂次方
     CHECK(m_hash_size > 0);
     CHECK(std::has_single_bit(m_hash_size));
@@ -10,10 +10,10 @@ FORCEINLINE HashTable::HashTable(uint32_t hash_size, uint32_t index_size): m_has
     if (m_index_size) {
         m_hash_mask = m_hash_size - 1;
         // 分配哈希桶的头索引和链表
-        m_hash       = new uint32_t[m_index_size];
-        m_next_index = new uint32_t[m_index_size];
+        m_hash       = new uint32[m_index_size];
+        m_next_index = new uint32[m_index_size];
         // 初始化数组元素为0xff
-        std::memset(m_hash, 0xff, m_hash_size * sizeof(uint32_t));
+        std::memset(m_hash, 0xff, m_hash_size * sizeof(uint32));
     }
 }
 
@@ -24,12 +24,12 @@ FORCEINLINE HashTable::HashTable(const HashTable& other):
     m_hash(EmptyHash), // 让未初始化或已释放的哈希表也能安全响应
     m_next_index(nullptr) {
     if (m_index_size) {
-        m_hash       = new uint32_t[m_hash_size];
-        m_next_index = new uint32_t[m_index_size];
+        m_hash       = new uint32[m_hash_size];
+        m_next_index = new uint32[m_index_size];
 
         // 拷贝内存
-        std::memcpy(m_hash, other.m_hash, m_hash_size * sizeof(uint32_t));
-        std::memcpy(m_next_index, other.m_next_index, m_index_size * sizeof(uint32_t));
+        std::memcpy(m_hash, other.m_hash, m_hash_size * sizeof(uint32));
+        std::memcpy(m_next_index, other.m_next_index, m_index_size * sizeof(uint32));
     }
 }
 
@@ -60,12 +60,12 @@ FORCEINLINE HashTable& HashTable::operator=(const HashTable& other) {
     m_next_index = nullptr;
 
     if (m_index_size) {
-        m_hash       = new uint32_t[m_hash_size];
-        m_next_index = new uint32_t[m_index_size];
+        m_hash       = new uint32[m_hash_size];
+        m_next_index = new uint32[m_index_size];
 
         // 拷贝内存
-        std::memcpy(m_hash, other.m_hash, m_hash_size * sizeof(uint32_t));
-        std::memcpy(m_next_index, other.m_next_index, m_index_size * sizeof(uint32_t));
+        std::memcpy(m_hash, other.m_hash, m_hash_size * sizeof(uint32));
+        std::memcpy(m_next_index, other.m_next_index, m_index_size * sizeof(uint32));
     }
 
     return *this;
@@ -89,7 +89,7 @@ FORCEINLINE HashTable& HashTable::operator=(HashTable&& other) noexcept {
 FORCEINLINE void HashTable::Clear() const {
     // 切断从桶到链表的访问入口
     if (m_index_size) {
-        std::memset(m_hash, 0xff, m_hash_size * sizeof(uint32_t));
+        std::memset(m_hash, 0xff, m_hash_size * sizeof(uint32));
     }
 }
 
@@ -106,13 +106,13 @@ FORCEINLINE void HashTable::Free() {
     }
 }
 
-FORCEINLINE void HashTable::Resize(uint32_t new_index_size) {
+FORCEINLINE void HashTable::Resize(uint32 new_index_size) {
     if (new_index_size == m_index_size) return;
     if (new_index_size == 0 || m_index_size == 0) return;
 
-    uint32_t* new_nex_index = new uint32_t[new_index_size];
+    uint32* new_nex_index = new uint32[new_index_size];
     if (m_next_index) {
-        std::memcpy(new_nex_index, m_next_index, m_index_size * sizeof(uint32_t));
+        std::memcpy(new_nex_index, m_next_index, m_index_size * sizeof(uint32));
         delete[] m_next_index;
     }
 
@@ -121,29 +121,29 @@ FORCEINLINE void HashTable::Resize(uint32_t new_index_size) {
 }
 
 // 返回key对应的链表的第一个索引
-FORCEINLINE uint32_t HashTable::First(uint32_t key) const {
+FORCEINLINE uint32 HashTable::First(uint32 key) const {
     key &= m_hash_mask;
     return m_hash[key];
 }
 
 // 返回链表当前索引后的下一个索引
-FORCEINLINE uint32_t HashTable::Next(uint32_t index) const {
+FORCEINLINE uint32 HashTable::Next(uint32 index) const {
     CHECK(index < m_index_size);
     // 避免链表节点自引用导致的无限循环
     CHECK(m_next_index[index] != index);
     return m_next_index[index];
 }
 
-FORCEINLINE bool HashTable::IsValid(uint32_t index) const {
+FORCEINLINE bool HashTable::IsValid(uint32 index) const {
     return index != ~0u;
 }
 
 // key决定元素放入哪个桶，index决定数据在外部数组中的索引位置，HashTable本身不存储数据，只存储索引
-FORCEINLINE void HashTable::Add(uint32_t key, uint32_t index) {
+FORCEINLINE void HashTable::Add(uint32 key, uint32 index) {
     // 如果提供的索引超出当前哈希表容量，动态扩容
     if (index >= m_index_size) {
         // 新容量取32和(index+1)向上取整到2的幂中的较大值
-        Resize(std::max<uint32_t>(32u, ((index + 1) <= 1) ? 1u : std::bit_ceil(static_cast<uint32_t>(index + 1))));
+        Resize(std::max<uint32>(32u, ((index + 1) <= 1) ? 1u : std::bit_ceil(static_cast<uint32>(index + 1))));
     }
 
     // 等价于 key % m_HashSize
@@ -156,18 +156,18 @@ FORCEINLINE void HashTable::Add(uint32_t key, uint32_t index) {
     m_hash[key] = index;
 }
 
-FORCEINLINE void HashTable::AddConcurrent(uint32_t key, uint32_t index) const {
+FORCEINLINE void HashTable::AddConcurrent(uint32 key, uint32 index) const {
     CHECK(index < m_index_size);
 
     key &= m_hash_mask;
     // 使用原子交换操作实现线程安全的头插法
     m_next_index[index] = std::atomic_exchange( // 将一个原子对象的值替换为新值并返回替换前的旧值
-        reinterpret_cast<std::atomic<uint32_t>*>(&m_hash[key]), // 将m_Hash[key]视为原子变量
+        reinterpret_cast<std::atomic<uint32>*>(&m_hash[key]), // 将m_Hash[key]视为原子变量
         index // 原子地读取m_Hash[key]的当前值，并将其替换为新的index
     ); // 将原始值设置为新元素的next指针
 }
 
-FORCEINLINE void HashTable::Remove(uint32_t key, uint32_t index) const {
+FORCEINLINE void HashTable::Remove(uint32 key, uint32 index) const {
     if (index >= m_index_size) {
         return;
     }
@@ -182,7 +182,7 @@ FORCEINLINE void HashTable::Remove(uint32_t key, uint32_t index) const {
     }
 
     // 从头节点开始遍历
-    for (uint32_t i = m_hash[key]; IsValid(i); i = m_next_index[i]) {
+    for (uint32 i = m_hash[key]; IsValid(i); i = m_next_index[i]) {
         if (m_next_index[i] == index) // 找到该节点
         {
             m_next_index[i] = m_next_index[index]; // 指向下下一个节点即可
