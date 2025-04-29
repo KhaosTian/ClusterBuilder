@@ -1,14 +1,12 @@
 #pragma once
 
-#if defined(_WIN32)
-    #include <intrin.h>
-    #define DEBUG_BREAK() __debugbreak()
-#else
-    #include <signal.h>
-    #define DEBUG_BREAK() raise(SIGTRAP)
-#endif
+
+#include <intrin.h>
+#define DEBUG_BREAK() __debugbreak()
 
 #define FORCEINLINE __forceinline
+
+#define RESTRICT __restrict
 
 using ErrorHandler = void (*)(const char*, const char*, int, const char*);
 

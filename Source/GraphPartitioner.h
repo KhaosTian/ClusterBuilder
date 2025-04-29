@@ -32,7 +32,7 @@ public:
     void AddLocalityLinks(GraphData* graph, uint32_t index, idx_t cost);
 
     template <typename FuncType>
-    void BuildLocalityLinks(DisjointSet& disjoint_set, const Bounds3f& bounds, std::vector<int32_t>& group_indexes, FuncType& GetCenter);
+    void BuildLocalityLinks(DisjointSet& disjoint_set, const Bounds3f& bounds, const std::vector<int32_t>& group_indexes, FuncType& GetCenter);
 
     void Partition(GraphData* graph);
 
@@ -55,5 +55,5 @@ public:
 };
 
 template<typename FuncType>
-FORCEINLINE void GraphPartitioner::BuildLocalityLinks(DisjointSet& disjoint_set, const Bounds3f& bounds, std::vector<int32_t>& group_indexes, FuncType& GetCenter) {
+FORCEINLINE void GraphPartitioner::BuildLocalityLinks(DisjointSet& disjoint_set, const Bounds3f& bounds, const std::vector<int32_t>& group_indexes, FuncType& GetCenter) {
 }

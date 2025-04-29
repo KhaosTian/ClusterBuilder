@@ -12,7 +12,7 @@ struct Vert {
     std::vector<Vector3f> Positions;
 };
 
-static void ClusterTriangles(Vert& verts, const std::vector<uint32_t>& indexes, std::vector<Cluster>& clusters, const Bounds3f& mesh_bounds) {
+static void ClusterTriangles(Vert& verts, const std::vector<uint32_t>& indexes, const std::vector<int32_t>& material_indexes, std::vector<Cluster>& clusters, const Bounds3f& mesh_bounds) {
     uint32_t num_triangles = static_cast<uint32_t>(indexes.size() / 3);
 
     Adjacency adjacency { indexes.size() };
@@ -67,6 +67,23 @@ static void ClusterTriangles(Vert& verts, const std::vector<uint32_t>& indexes, 
                 disjoint_set.UnionSequential(edge_index0 / 3, edge_index1 / 3);
             }
         });
+    }
+
+    // 初始化图划分器
+    GraphPartitioner patitioner(num_triangles, Cluster::ClusterSize - 4, Cluster::ClusterSize);
+    {
+        // 获取三角形的中心坐标
+        auto GetCenter = [&verts, &indexes](uint32_t tri_index) { Vector3f center;
+            center = verts.Positions[indexes[tri_index * 3 + 0]];
+            center += verts.Positions[indexes[tri_index * 3 + 1]];
+            center += verts.Positions[indexes[tri_index * 3 + 2]];
+            return center * (1.0f / 3.0f);
+        };
+
+        patitioner.BuildLocalityLinks(disjoint_set, mesh_bounds, material_indexes, GetCenter);
+
+        // restrict 保证只有这个指针指向这块内存，方便编译器优化，若违反则可能导致未定义行为
+        auto* RESTRICT graph = patitioner.NewGraph(num_triangles * 3);
     }
 }
 
