@@ -1,7 +1,7 @@
 #pragma once
 
 #include "VectorMath.h"
-#include "Math/Bounds.h"
+#include "Math/BoundingBox.h"
 
 class Cluster {
 public:

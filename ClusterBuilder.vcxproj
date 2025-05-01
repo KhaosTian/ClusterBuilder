@@ -101,7 +101,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Source\Math\Bounds.cpp" />
     <ClCompile Include="Source\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
@@ -111,7 +110,7 @@
     <ClInclude Include="Source\DisjointSet.h" />
     <ClInclude Include="Source\GraphPartitioner.h" />
     <ClInclude Include="Source\HashTable.h" />
-    <ClInclude Include="Source\Math\Bounds.h" />
+    <ClInclude Include="Source\Math\BoundingBox.h" />
     <ClInclude Include="Source\Math\SimpleMath.h" />
     <ClInclude Include="Source\Math\SimpleMath.inl" />
     <ClInclude Include="Source\Parallel.h" />

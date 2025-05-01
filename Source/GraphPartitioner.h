@@ -1,7 +1,7 @@
 #pragma once
 
 #include "DisjointSet.h"
-#include "Math/Bounds.h"
+#include "Math/BoundingBox.h"
 
 class GraphPartitioner {
 public:
