@@ -92,9 +92,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Adjacency.cpp" />
     <ClCompile Include="Source\Cluster.cpp" />
-    <ClCompile Include="Source\DisjointSet.cpp" />
     <ClCompile Include="Source\GraphPartitioner.cpp" />
     <ClCompile Include="Source\main.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>

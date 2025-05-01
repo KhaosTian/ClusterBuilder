@@ -3,7 +3,7 @@
 #include <intrin.h>
 #define DEBUG_BREAK() __debugbreak()
 
-#define FORCEINLINE 
+#define FORCEINLINE inline
 
 #define RESTRICT __restrict
 
