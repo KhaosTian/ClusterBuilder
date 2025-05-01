@@ -7,6 +7,8 @@
 
 #define RESTRICT __restrict
 
+#define NOMINMAX
+
 using int16 = int16_t;
 using int32 = int32_t;
 using int64 = int64_t;

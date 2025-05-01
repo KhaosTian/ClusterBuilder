@@ -65,7 +65,7 @@ FORCEINLINE void EdgeHash::ForAllMatching(int32 edge_index, bool need_add, FuncT
     // 从头节点开始遍历该哈希桶所有边
     for (uint32 other_edge_index = hash_table.First(hash); hash_table.IsValid(other_edge_index); other_edge_index = hash_table.Next(other_edge_index)) {
         // 匹配和当前边共享顶点但是方向相反的边，即两个三角形共享一条边
-        if (position0 == GetPosition(Cycle3(other_edge_index)) && position1 == GetPosition(other_edge_index)) {
+        if ( position0 == GetPosition(Cycle3(other_edge_index)) && position1 == GetPosition(other_edge_index)) {
             Function(edge_index, other_edge_index);
         }
     }

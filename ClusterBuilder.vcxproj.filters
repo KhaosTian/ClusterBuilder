@@ -36,6 +36,15 @@
     <ClCompile Include="Source\HashTable.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Math\BoundingSphere.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Math\Frustum.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Math\Random.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Cluster.h">
@@ -45,141 +54,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Source\Common.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UGM\basic.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UGM\bbox.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UGM\config.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UGM\euler.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UGM\hvec.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UGM\line.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UGM\mat.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UGM\material.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UGM\normal.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UGM\plane.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UGM\point.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UGM\quat.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UGM\ray.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UGM\rgb.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UGM\rgba.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UGM\sample.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UGM\scale.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UGM\svec.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UGM\transform.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UGM\triangle.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UGM\UGM.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UGM\val.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UGM\vec.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UTemplate\Func.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UTemplate\Name.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UTemplate\SI.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UTemplate\TemplateList.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UTemplate\TStr.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UTemplate\Type.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UTemplate\TypeList.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UTemplate\Util.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UTemplate\StdName\Name_vector.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UTemplate\StdName\Name_deque.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UTemplate\StdName\Name_forward_list.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UTemplate\StdName\Name_list.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UTemplate\StdName\Name_map.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UTemplate\StdName\Name_memory.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UTemplate\StdName\Name_queue.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UTemplate\StdName\Name_set.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UTemplate\StdName\Name_span.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UTemplate\StdName\Name_stack.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UTemplate\StdName\Name_string.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UTemplate\StdName\Name_string_view.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UTemplate\StdName\Name_unordered_map.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="External\UTemplate\StdName\Name_unordered_set.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Source\StridedView.h">
@@ -206,31 +80,50 @@
     <ClInclude Include="Source\GraphPartitioner.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Math\BoundingBox.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Math\BoundingPlane.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Math\BoundingSphere.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Math\Common.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Math\Frustum.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Math\Matrix3.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Math\Matrix4.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Math\Quaternion.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Math\Random.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Math\Scalar.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Math\Transform.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Math\Vector.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
     <None Include=".gitignore" />
-    <None Include="External\UTemplate\details\Func.inl">
-      <Filter>头文件</Filter>
-    </None>
-    <None Include="External\UTemplate\details\Name.inl">
-      <Filter>头文件</Filter>
-    </None>
-    <None Include="External\UTemplate\details\SI.inl">
-      <Filter>头文件</Filter>
-    </None>
-    <None Include="External\UTemplate\details\TemplateList.inl">
-      <Filter>头文件</Filter>
-    </None>
-    <None Include="External\UTemplate\details\ToTTType.inl">
-      <Filter>头文件</Filter>
-    </None>
-    <None Include="External\UTemplate\details\TypeList.inl">
-      <Filter>头文件</Filter>
-    </None>
-    <None Include="External\UTemplate\details\Util.inl">
-      <Filter>头文件</Filter>
-    </None>
     <None Include=".clang-format" />
+    <None Include="Source\Math\Functions.inl">
+      <Filter>头文件</Filter>
+    </None>
+    <None Include="cpp.hint" />
   </ItemGroup>
 </Project>

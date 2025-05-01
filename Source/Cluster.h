@@ -1,19 +1,22 @@
 #pragma once
 
+#include "VectorMath.h"
+#include "Math/Bounds.h"
+
 class Cluster {
 public:
     Cluster() {}
 
 public:
     Vector3f& GetPosition(uint32 vertIndex);
-    Normal3f& GetNormal(uint32 vertIndex);
-    Vector2f& GetUVs(uint32 vertIndex);
-    Color3f&  GetColor(uint32 vertIndex);
+    Vector3f& GetNormal(uint32 vertIndex);
+    Vector3f& GetUVs(uint32 vertIndex);
+    Vector3f&  GetColor(uint32 vertIndex);
 
     const Vector3f& GetPosition(uint32 vertIndex) const;
-    const Normal3f& GetNormal(uint32 vertIndex) const;
-    const Vector2f& GetUVs(uint32 vertIndex) const;
-    const Color3f&  GetColor(uint32 vertIndex) const;
+    const Vector3f& GetNormal(uint32 vertIndex) const;
+    const Vector3f& GetUVs(uint32 vertIndex) const;
+    const Vector3f&  GetColor(uint32 vertIndex) const;
 
     static const uint16_t ClusterSize = 128;
 

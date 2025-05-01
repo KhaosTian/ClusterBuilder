@@ -9,7 +9,7 @@
 #include "GraphPartitioner.h"
 
 struct Vert {
-    std::vector<Vector3f> Positions;
+    std::vector<Point3f> Positions;
 };
 
 static void ClusterTriangles(
@@ -32,12 +32,12 @@ static void ClusterTriangles(
     });
 
     // 将每个索引视作一条边，确定边的邻接关系
-    ParallelFor("ClusterTriangles.ParalleFor", indexes.size(), 1024, [&](int edge_index) {
+    ParallelFor("ClusterTriangles.ParalleFor", indexes.size(), 1024, [&](int32 edge_index) {
         int32 adj_index = -1; // -1表示没有邻接边
         int32 adj_count = 0;
 
         // 遍历边的邻接边
-        edge_hash.ForAllMatching(edge_index, false, GetPosition, [&](int32 edge_ndex, int32 other_edge_index) {
+        edge_hash.ForAllMatching(edge_index, false, GetPosition, [&](int32 edge_index, int32 other_edge_index) {
             adj_index = other_edge_index; // 记录邻接边的索引
             adj_count++;
         });
@@ -51,7 +51,7 @@ static void ClusterTriangles(
     DisjointSet disjoint_set(num_triangles);
 
     // 遍历所有边，最终得到若干个互不连通的拓扑结构
-    for (uint32 edge_index = 0, num = indexes.size(); edge_index < num; edge_index++) {
+    for (uint32 edge_index = 0, num = static_cast<uint32>(indexes.size()); edge_index < num; edge_index++) {
         // 处理复杂边
         if (adjacency.direct[edge_index] == -2) {
             std::vector<std::pair<int32, int32>> edges;
@@ -84,7 +84,7 @@ static void ClusterTriangles(
     {
         // 获取三角形的中心坐标
         auto GetCenter = [&verts, &indexes](uint32 tri_index) {
-            Vector3f center;
+            Point3f center;
             center = verts.Positions[indexes[tri_index * 3 + 0]];
             center += verts.Positions[indexes[tri_index * 3 + 1]];
             center += verts.Positions[indexes[tri_index * 3 + 2]];
@@ -105,7 +105,7 @@ static void ClusterTriangles(
             for (int k = 0; k < 3; k++) {
                 // 遍历边的所有邻接边
                 adjacency.ForAll(tri_index * 3 + k, [&partitioner, graph](int32 edge_index, int32 adj_index) {
-                    partitioner.AddAdjaceny(graph, adj_index / 3, idx_t(4 * 65)); // 将邻接边所在的三角形索引添加到邻接三角形
+                    partitioner.AddAdjaceny(graph, adj_index / 3, 4 * 65); // 将邻接边所在的三角形索引添加到邻接三角形
                 });
             }
 

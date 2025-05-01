@@ -101,60 +101,19 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Source\Math\Bounds.cpp" />
     <ClCompile Include="Source\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="External\UGM\basic.hpp" />
-    <ClInclude Include="External\UGM\bbox.hpp" />
-    <ClInclude Include="External\UGM\config.hpp" />
-    <ClInclude Include="External\UGM\euler.hpp" />
-    <ClInclude Include="External\UGM\hvec.hpp" />
-    <ClInclude Include="External\UGM\line.hpp" />
-    <ClInclude Include="External\UGM\mat.hpp" />
-    <ClInclude Include="External\UGM\material.hpp" />
-    <ClInclude Include="External\UGM\normal.hpp" />
-    <ClInclude Include="External\UGM\plane.hpp" />
-    <ClInclude Include="External\UGM\point.hpp" />
-    <ClInclude Include="External\UGM\quat.hpp" />
-    <ClInclude Include="External\UGM\ray.hpp" />
-    <ClInclude Include="External\UGM\rgb.hpp" />
-    <ClInclude Include="External\UGM\rgba.hpp" />
-    <ClInclude Include="External\UGM\sample.hpp" />
-    <ClInclude Include="External\UGM\scale.hpp" />
-    <ClInclude Include="External\UGM\svec.hpp" />
-    <ClInclude Include="External\UGM\transform.hpp" />
-    <ClInclude Include="External\UGM\triangle.hpp" />
-    <ClInclude Include="External\UGM\UGM.hpp" />
-    <ClInclude Include="External\UGM\val.hpp" />
-    <ClInclude Include="External\UGM\vec.hpp" />
-    <ClInclude Include="External\UTemplate\Func.hpp" />
-    <ClInclude Include="External\UTemplate\Name.hpp" />
-    <ClInclude Include="External\UTemplate\SI.hpp" />
-    <ClInclude Include="External\UTemplate\StdName\Name_deque.hpp" />
-    <ClInclude Include="External\UTemplate\StdName\Name_forward_list.hpp" />
-    <ClInclude Include="External\UTemplate\StdName\Name_list.hpp" />
-    <ClInclude Include="External\UTemplate\StdName\Name_map.hpp" />
-    <ClInclude Include="External\UTemplate\StdName\Name_memory.hpp" />
-    <ClInclude Include="External\UTemplate\StdName\Name_queue.hpp" />
-    <ClInclude Include="External\UTemplate\StdName\Name_set.hpp" />
-    <ClInclude Include="External\UTemplate\StdName\Name_span.hpp" />
-    <ClInclude Include="External\UTemplate\StdName\Name_stack.hpp" />
-    <ClInclude Include="External\UTemplate\StdName\Name_string.hpp" />
-    <ClInclude Include="External\UTemplate\StdName\Name_string_view.hpp" />
-    <ClInclude Include="External\UTemplate\StdName\Name_unordered_map.hpp" />
-    <ClInclude Include="External\UTemplate\StdName\Name_unordered_set.hpp" />
-    <ClInclude Include="External\UTemplate\StdName\Name_vector.hpp" />
-    <ClInclude Include="External\UTemplate\TemplateList.hpp" />
-    <ClInclude Include="External\UTemplate\TStr.hpp" />
-    <ClInclude Include="External\UTemplate\Type.hpp" />
-    <ClInclude Include="External\UTemplate\TypeList.hpp" />
-    <ClInclude Include="External\UTemplate\Util.hpp" />
     <ClInclude Include="Source\Adjacency.h" />
     <ClInclude Include="Source\DisjointSet.h" />
     <ClInclude Include="Source\GraphPartitioner.h" />
     <ClInclude Include="Source\HashTable.h" />
+    <ClInclude Include="Source\Math\Bounds.h" />
+    <ClInclude Include="Source\Math\SimpleMath.h" />
+    <ClInclude Include="Source\Math\SimpleMath.inl" />
     <ClInclude Include="Source\Parallel.h" />
     <ClInclude Include="Source\EdgeHash.h" />
     <ClInclude Include="Source\Cluster.h" />
@@ -166,13 +125,7 @@
   <ItemGroup>
     <None Include=".clang-format" />
     <None Include=".gitignore" />
-    <None Include="External\UTemplate\details\Func.inl" />
-    <None Include="External\UTemplate\details\Name.inl" />
-    <None Include="External\UTemplate\details\SI.inl" />
-    <None Include="External\UTemplate\details\TemplateList.inl" />
-    <None Include="External\UTemplate\details\ToTTType.inl" />
-    <None Include="External\UTemplate\details\TypeList.inl" />
-    <None Include="External\UTemplate\details\Util.inl" />
+    <None Include="cpp.hint" />
     <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

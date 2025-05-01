@@ -1,6 +1,7 @@
 #pragma once
 
-#include "DisjointSet.h";
+#include "DisjointSet.h"
+#include "Math/Bounds.h"
 
 class GraphPartitioner {
 public:
@@ -78,7 +79,7 @@ FORCEINLINE static constexpr uint32 ReverseMortonCode3(uint32 x) {
 }
 
 template<class FuncType>
-FORCEINLINE static void RadixSort32(uint32* RESTRICT dst, uint32* RESTRICT src, uint32 num, FuncType& SortKey) {
+FORCEINLINE static void RadixSort32(uint32* RESTRICT dst, uint32* RESTRICT src, uint32 num, FuncType&& SortKey) {
     // 将莫顿码分割为低10位、中11位和高11位，对应1024个桶，2048个桶，2048个桶
     uint32 histograms[1024 + 2048 + 2048];
 
@@ -135,7 +136,7 @@ FORCEINLINE static void RadixSort32(uint32* RESTRICT dst, uint32* RESTRICT src, 
             uint32 value = s[i]; // 三角形的索引
             uint32 key   = SortKey(value); // 根据三角形索引得到三角形的莫顿码
 
-            uint32 bucket = (key >> 0) & 1023];// 掩码截取莫顿码的低10位
+            uint32 bucket = (key >> 0) & 1023; // 掩码截取莫顿码的低10位
             uint32 index  = ++histogram0[bucket]; // 获取该桶的前缀和，前缀和并加一为下一次遍历到该桶做准备
             d[index]      = value; // 将该索引放到排序的位置
         }
@@ -149,7 +150,7 @@ FORCEINLINE static void RadixSort32(uint32* RESTRICT dst, uint32* RESTRICT src, 
             uint32 value = s[i];
             uint32 key   = SortKey(value);
 
-            uint32 bucket = (key >> 10) & 2047];
+            uint32 bucket = (key >> 10) & 2047;
             uint32 index  = ++histogram1[bucket];
             d[index]      = value;
         }
@@ -163,11 +164,15 @@ FORCEINLINE static void RadixSort32(uint32* RESTRICT dst, uint32* RESTRICT src, 
             uint32 value = s[i];
             uint32 key   = SortKey(value);
 
-            uint32 bucket = (key >> 21) & 2047];
+            uint32 bucket = (key >> 21) & 2047;
             uint32 index  = ++histogram2[bucket];
             d[index]      = value;
         }
     }
+}
+
+FORCEINLINE static float MaxComponent(Vector3f v) {
+    return (v.x > v.y) ? (v.x > v.z ? v.x : v.z) : (v.y > v.z ? v.y : v.z);
 }
 
 // 在空间上建立三角形的邻近关系
@@ -184,20 +189,22 @@ FORCEINLINE void GraphPartitioner::BuildLocalityLinks(
 
     const bool enable_groups = !group_indexes.empty();
 
-    ParallelFor("BuildLocalityLinks.ParallelFor", num_elements, 4096, [&](uint32 index) {
-        Vector3f center = GetCenter(index);
-        // 得到0到1的归一化本地坐标
-        Vector3f cenetr_local = (center - bounds.minP) // 将坐标系转换到以包围盒最小点为原点的本地坐标系
-                                / Vector3f(bounds.maxP - bounds.minP).max; // 除以包围盒的尺寸得到归一化的坐标
+    ParallelFor("BuildLocalityLinks.ParallelFor",
+                num_elements,
+                4096,
+                [&](uint32 index) {
+                    Point3f center = GetCenter(index);
+                    // 将坐标系转换到以包围盒最小点为原点的本地坐标系,除以包围盒的尺寸得到归一化的坐标
+                    Point3f center_local = (center - bounds.GetMin()) / (bounds.GetMax() - bounds.GetMin());
 
-        // 将3D坐标映射为一维的莫顿码，空间上接近的坐标其数值也更接近
-        uint32 morton;
-        // 分别获取三个维度的莫顿码，将0到1的坐标放大为0到1023的整数
-        morton = MorotonCode3(uint32(cenetr_local.x * 1023));
-        morton |= MorotonCode3(uint32(cenetr_local.y * 1023)) << 1;
-        morton != MorotonCode3(uint32(cenetr_local.z * 1023)) << 2;
-        sort_keys[index] = morton;
-    });
+                    // 将3D坐标映射为一维的莫顿码，空间上接近的坐标其数值也更接近
+                    uint32 morton;
+                    // 分别获取三个维度的莫顿码，将0到1的坐标放大为0到1023的整数
+                    morton = MorotonCode3(static_cast<uint32>(center_local.x * 1023));
+                    morton |= MorotonCode3(static_cast<uint32>(center_local.y * 1023)) << 1;
+                    morton |= MorotonCode3(static_cast<uint32>(center_local.z * 1023)) << 2;
+                    sort_keys[index] = morton;
+                });
 
     // 基数排序
     RadixSort32(sorted_to.data(), indexes.data(), num_elements, [&](uint32 index) { return sort_keys[index]; });
@@ -207,10 +214,9 @@ FORCEINLINE void GraphPartitioner::BuildLocalityLinks(
     sort_keys.shrink_to_fit();
 
     // 交换数据后，indexes可以根据位置索引得到三角形索引
-    std::swap(indexes, sorted_to); 
+    std::swap(indexes, sorted_to);
     // 遍历所有三角形，做反向映射
-    for (uint32 i = 0; i < num_elements; i++)
-    {
+    for (uint32 i = 0; i < num_elements; i++) {
         sorted_to[indexes[i]] = i; // sorted_to可以根据三角形索引得到位置索引
     }
 
@@ -218,8 +224,8 @@ FORCEINLINE void GraphPartitioner::BuildLocalityLinks(
     std::vector<Range> island_ranges;
     island_ranges.reserve(num_elements);
 
-    { 
-        uint32 curr_range = 0;
+    {
+        uint32 curr_range  = 0;
         uint32 range_begin = 0;
 
         // 遍历所有三角形
@@ -233,7 +239,7 @@ FORCEINLINE void GraphPartitioner::BuildLocalityLinks(
                 }
 
                 // 更新当前range标识和begin索引
-                curr_range = range_id;
+                curr_range  = range_id;
                 range_begin = i;
             }
 
@@ -241,7 +247,7 @@ FORCEINLINE void GraphPartitioner::BuildLocalityLinks(
         }
 
         // 完成最后一个range的end更新
-        for (uint32 j = range_begin; j < num_elements, j++) {
+        for (uint32 j = range_begin; j < num_elements; j++) {
             island_ranges[j].end = num_elements - 1;
         }
     }
@@ -256,16 +262,16 @@ FORCEINLINE void GraphPartitioner::BuildLocalityLinks(
             uint32 island_id = disjoint_set[index];
             int32  group_id  = enable_groups ? group_indexes[index] : 0;
 
-            Vector3f center = GetCenter(index);
+            Point3f center = GetCenter(index);
 
             const uint32 max_links = 5;
 
             // 初始化
             uint32 closest_index[max_links];
             float  closest_dist2[max_links];
-            for (int32 k = 0; k < max_links; k++) {
+            for (auto k = 0; k < max_links; k++) {
                 closest_index[k] = ~0u;
-                closest_dist2[k] = std::numeric_limits<float>::max();
+                closest_dist2[k] = FLT_MAX;
             }
 
             // 向前和向后搜索邻接adj的island
@@ -280,22 +286,20 @@ FORCEINLINE void GraphPartitioner::BuildLocalityLinks(
                     if (adj == limit) break;
                     adj += step;
 
-                    uint32 adj_index = indexes[adj];
+                    uint32 adj_index     = indexes[adj];
                     uint32 adj_island_id = disjoint_set[adj_index]; // 获取邻接三角形所属的island
 
                     int32 adj_group_id = enable_groups ? group_indexes[adj_index] : 0;
 
                     // island相同 或者 group不匹配 则跳过整个区间
-                    if (island_id == adj_island_id || (group_id != adj_group_id))
-                    {
+                    if (island_id == adj_island_id || (group_id != adj_group_id)) {
                         if (direction)
                             adj = island_ranges[adj].end;
                         else
                             adj = island_ranges[adj].begin;
-                    }
-                    else {
+                    } else {
                         // 计算二者的距离，按最短距离优先存入数组，记录索引
-                        float adj_dist2 = center.distance2(GetCenter(adj_index));
+                        float adj_dist2 = Math::Vector3::DistanceSquared(center, GetCenter(adj_index));
                         for (int k = 0; k < max_links; k++) {
                             // 维护最多5个元素的最近邻居数组
                             if (adj_dist2 < closest_dist2[k]) {
@@ -316,5 +320,4 @@ FORCEINLINE void GraphPartitioner::BuildLocalityLinks(
             }
         }
     }
-
 }
