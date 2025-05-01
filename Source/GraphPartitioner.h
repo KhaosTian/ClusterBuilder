@@ -74,35 +74,38 @@ FORCEINLINE static void RadixSort32(uint32* RESTRICT dst, uint32* RESTRICT src, 
     uint32 histograms[1024 + 2048 + 2048];
 
     uint32* RESTRICT histogram0 = histograms + 0;
-    uint32* RESTRICT histogram1 = histograms0 + 1024;
-    uint32* RESTRICT histogram2 = histograms1 + 2048;
+    uint32* RESTRICT histogram1 = histogram0 + 1024;
+    uint32* RESTRICT histogram2 = histogram1 + 2048;
 
     std::memset(histograms, 0, sizeof(histograms)); // 都初始化为0
 
-    // 分桶
+    // 分桶，桶数组本身就是排序好的0到1023
     {
         const uint32* RESTRICT s = (const uint32* RESTRICT)src;
+        // 遍历三角形
         for (auto i = 0; i < num; i++) {
             uint32 key = SortKey(s[i]); // 获取三角形的莫顿码
-
+            // 初始化桶数组histograms，此时每个桶存储的是匹配该桶的元素数量
             histogram0[(key >> 0) & 1023]++; // 00000000 00000000 00000011 11111111
             histogram1[(key >> 10) & 2047]++; // 00000000 00000000 00000111 11111111
             histogram2[(key >> 21) & 2047]++; // 00000000 00000000 00000111 11111111
         }
     }
 
-    // 前缀和
+    // 前缀和，此时桶数组histograms中的元素数量，变为累加和，最后一个桶中是所有元素数量
     { 
         uint32 sum0 = 0;
         uint32 sum1 = 0;
         uint32 sum2 = 0;
 
-        for (auto i = 0; i < 1024; i++) {
-            uint32 t;
-
-            t             = histogram0[i] + sum0;
-            histogram0[i] = sum0 - 1;
-            sum0          = t;
+        // 遍历所有桶构造前缀和
+        for (uint32 i = 0, t = 0; i < 2048; i++) {
+            // for循环会将前面的元素数量加起来赋值给桶，等于计算了该桶元素在最终排序数组中的的起始索引（-1）
+            if (i < 1024) {
+                t             = histogram0[i] + sum0;
+                histogram0[i] = sum0 - 1; 
+                sum0          = t;
+            }
 
             t             = histogram1[i] + sum1;
             histogram1[i] = sum1 - 1;
@@ -111,6 +114,49 @@ FORCEINLINE static void RadixSort32(uint32* RESTRICT dst, uint32* RESTRICT src, 
             t             = histogram2[i] + sum2;
             histogram2[i] = sum2 - 1;
             sum2          = t;
+        }
+    }
+
+    // sort pass 1 对低10位排序
+    {
+        const uint32* RESTRICT s = (const uint32* RESTRICT)src; // indexes，三角形索引数组
+        uint32* RESTRICT       d = dst; // sorted_to，排序结果
+        // 遍历三角形
+        for (uint32 i = 0; i < num; i++) {
+            uint32 value = s[i]; // 三角形的索引
+            uint32 key   = SortKey(value); // 根据三角形索引得到三角形的莫顿码
+
+            uint32 bucket = (key >> 0) & 1023];// 掩码截取莫顿码的低10位
+            uint32 index  = ++histogram0[bucket]; // 获取该桶的前缀和，前缀和并加一为下一次遍历到该桶做准备
+            d[index]      = value; // 将该索引放到排序的位置
+        }
+    }
+
+    // sort pass 2 对中11位排序，但是基于sort pass 1的排序结果原地排序
+    {
+        const uint32* RESTRICT s = (const uint32* RESTRICT)dst;
+        uint32* RESTRICT       d = src;
+        for (uint32 i = 0; i < num; i++) {
+            uint32 value = s[i];
+            uint32 key   = SortKey(value);
+
+            uint32 bucket = (key >> 10) & 2047];
+            uint32 index  = ++histogram1[bucket];
+            d[index]      = value;
+        }
+    }
+
+    // sort pass 3 对高11位排序，继续反转
+    {
+        const uint32* RESTRICT s = (const uint32* RESTRICT)src;
+        uint32* RESTRICT       d = dst;
+        for (uint32 i = 0; i < num; i++) {
+            uint32 value = s[i];
+            uint32 key   = SortKey(value);
+
+            uint32 bucket = (key >> 21) & 2047];
+            uint32 index  = ++histogram2[bucket];
+            d[index]      = value;
         }
     }
 }
@@ -145,7 +191,6 @@ FORCEINLINE void GraphPartitioner::BuildLocalityLinks(
                                 / Vector3f(bounds.maxP - bounds.minP).max; // 除以包围盒的尺寸得到归一化的坐标
 
         // 将3D坐标映射为一维的莫顿码，空间上接近的坐标其数值也更接近
-
         uint32 morton;
         // 分别获取三个维度的莫顿码，将0到1的坐标放大为0到1023的整数
         morton = MorotonCode3(uint32(cenetr_local.x * 1023));
