@@ -9,9 +9,9 @@ public:
         int32 offset;
         int32 num;
 
-        std::vector<idx_t> adjacency;
-        std::vector<idx_t> adjacency_cost;
-        std::vector<idx_t> adjacency_offset;
+        std::vector<idx_t> adjacency {};
+        std::vector<idx_t> adjacency_cost {};
+        std::vector<idx_t> adjacency_offset {};
     };
 
     struct Range {

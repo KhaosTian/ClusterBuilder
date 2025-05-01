@@ -8,12 +8,12 @@
 #include "DisjointSet.h"
 #include "GraphPartitioner.h"
 
-struct Vert {
+struct MeshBuildVertexView {
     std::vector<Point3f> Positions;
 };
 
 static void ClusterTriangles(
-    Vert&                      verts,
+    MeshBuildVertexView&       verts,
     const std::vector<uint32>& indexes,
     const std::vector<int32>&  material_indexes,
     std::vector<Cluster>&      clusters,
@@ -99,8 +99,8 @@ static void ClusterTriangles(
 
         // 遍历每个三角形
         for (uint32 i = 0; i < num_triangles; i++) {
-            graph->adjacency_offset[i] = graph->adjacency.size();// 设置邻接表偏移量
-            uint32 tri_index           = partitioner.indexes[i];// 获取三角形索引
+            graph->adjacency_offset[i] = graph->adjacency.size(); // 设置邻接表偏移量
+            uint32 tri_index           = partitioner.indexes[i]; // 获取三角形索引
             // 遍历三角形的三个边
             for (int k = 0; k < 3; k++) {
                 // 遍历边的所有邻接边
@@ -122,10 +122,16 @@ static void ClusterTriangles(
 
         CHECK(partitioner.ranges.size());
     }
-
-
 }
 
 int main() {
+    MeshBuildVertexView verts {};
+    std::vector<uint32>              indexes {};
+    std::vector<int32>               material_indexes {};
+    std::vector<Cluster>             clusters = {};
+    Bounds3f                         mesh_bounds;
+
+    ClusterTriangles(verts, indexes, material_indexes, clusters, mesh_bounds);
+
     return 0;
 }

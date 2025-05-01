@@ -33,18 +33,6 @@
     <ClCompile Include="Source\DisjointSet.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Source\HashTable.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Math\BoundingSphere.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Math\Frustum.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Math\Random.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Cluster.h">
@@ -83,37 +71,10 @@
     <ClInclude Include="Source\Math\BoundingBox.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Math\BoundingPlane.h">
+    <ClInclude Include="Source\Math\SimpleMath.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Math\BoundingSphere.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Math\Common.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Math\Frustum.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Math\Matrix3.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Math\Matrix4.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Math\Quaternion.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Math\Random.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Math\Scalar.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Math\Transform.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Math\Vector.h">
+    <ClInclude Include="Source\Math\SimpleMath.inl">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -121,9 +82,6 @@
     <None Include="README.md" />
     <None Include=".gitignore" />
     <None Include=".clang-format" />
-    <None Include="Source\Math\Functions.inl">
-      <Filter>头文件</Filter>
-    </None>
     <None Include="cpp.hint" />
   </ItemGroup>
 </Project>
