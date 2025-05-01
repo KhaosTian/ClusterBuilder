@@ -46,16 +46,16 @@ public:
     void BisectGraph(GraphData* graph, GraphData* child_graphs[2]);
     void RecursiveBisectGraph(GraphData* graph);
 
-    uint32 m_num_elements;
-    int32  m_min_partition_size;
-    int32  m_max_partition_size;
+    uint32 num_elements;
+    int32  min_partition_size;
+    int32  max_partition_size;
 
-    std::atomic<uint32> m_num_parition;
+    std::atomic<uint32> num_parition;
 
     std::vector<idx_t> partition_ids;
     std::vector<int32> swapped_with;
 
-    std::multimap<int32, uint32> m_locality_links;
+    std::multimap<int32, uint32> locality_links;
 };
 
 FORCEINLINE static constexpr uint32 MorotonCode3(uint32 x) {
@@ -179,12 +179,12 @@ FORCEINLINE void GraphPartitioner::BuildLocalityLinks(
     FuncType&                 GetCenter
 ) {
     std::vector<uint32> sort_keys; // 存储每个三角形质心的莫顿码
-    sort_keys.reserve(m_num_elements);
-    sorted_to.reserve(m_num_elements);
+    sort_keys.reserve(num_elements);
+    sorted_to.reserve(num_elements);
 
     const bool enable_element_groups = !group_indexes.empty();
 
-    ParallelFor("BuildLocalityLinks.ParallelFor", m_num_elements, 4096, [&](uint32 index) {
+    ParallelFor("BuildLocalityLinks.ParallelFor", num_elements, 4096, [&](uint32 index) {
         Vector3f center = GetCenter(index);
         // 得到0到1的归一化本地坐标
         Vector3f cenetr_local = (center - bounds.minP) // 将坐标系转换到以包围盒最小点为原点的本地坐标系
@@ -199,17 +199,51 @@ FORCEINLINE void GraphPartitioner::BuildLocalityLinks(
         sort_keys[index] = morton;
     });
 
-    // 
-    RadixSort32(sorted_to.data(), indexes.data(), m_num_elements, [&](uint32 index) { return sort_keys[index]; });
+    // 基数排序
+    RadixSort32(sorted_to.data(), indexes.data(), num_elements, [&](uint32 index) { return sort_keys[index]; });
 
+    // 清理sort_keys数组
     sort_keys.clear();
     sort_keys.shrink_to_fit();
 
     // 交换数据后，indexes可以根据位置索引得到三角形索引
     std::swap(indexes, sorted_to); 
     // 遍历所有三角形，做反向映射
-    for (uint32 i = 0; i < m_num_elements; i++)
+    for (uint32 i = 0; i < num_elements; i++)
     {
         sorted_to[indexes[i]] = i; // sorted_to可以根据三角形索引得到位置索引
     }
+
+    // 每个三角形都有一个range记录所属联通区域的起始和结束
+    std::vector<Range> island_ranges;
+    island_ranges.reserve(num_elements);
+
+    { 
+        uint32 curr_range = 0;
+        uint32 range_begin = 0;
+
+        // 遍历所有三角形
+        for (uint32 i = 0; i < num_elements; i++) {
+            // 确定当前三角形所属的连通区域
+            uint32 range_id = disjoint_set.Find(indexes[i]);
+            if (curr_range != range_id) {
+                // 更新区域内所有range的end
+                for (uint32 j = range_begin; j < i; j++) {
+                    island_ranges[j].end = i - 1;
+                }
+
+                // 更新当前range标识和begin索引
+                curr_range = range_id;
+                range_begin = i;
+            }
+
+            island_ranges[i].begin = range_begin; // 设置该三角形所属联通区域的begin
+        }
+
+        // 完成最后一个range的end更新
+        for (uint32 j = range_begin; j < num_elements, j++) {
+            island_ranges[j].end = num_elements - 1;
+        }
+    }
+
 }
