@@ -68,6 +68,15 @@ FORCEINLINE static constexpr uint32 MorotonCode3(uint32 x) {
     return x;
 }
 
+FORCEINLINE static constexpr uint32 ReverseMortonCode3(uint32 x) {
+    x &= 0x09249249;
+    x = (x ^ (x >> 2)) & 0x030c30c3;
+    x = (x ^ (x >> 4)) & 0x0300f00f;
+    x = (x ^ (x >> 8)) & 0xff0000ff;
+    x = (x ^ (x >> 16)) & 0x000003ff;
+    return x;
+}
+
 template<class FuncType>
 FORCEINLINE static void RadixSort32(uint32* RESTRICT dst, uint32* RESTRICT src, uint32 num, FuncType& SortKey) {
     // 将莫顿码分割为低10位、中11位和高11位，对应1024个桶，2048个桶，2048个桶
@@ -93,7 +102,7 @@ FORCEINLINE static void RadixSort32(uint32* RESTRICT dst, uint32* RESTRICT src, 
     }
 
     // 前缀和，此时桶数组histograms中的元素数量，变为累加和，最后一个桶中是所有元素数量
-    { 
+    {
         uint32 sum0 = 0;
         uint32 sum1 = 0;
         uint32 sum2 = 0;
@@ -103,7 +112,7 @@ FORCEINLINE static void RadixSort32(uint32* RESTRICT dst, uint32* RESTRICT src, 
             // for循环会将前面的元素数量加起来赋值给桶，等于计算了该桶元素在最终排序数组中的的起始索引（-1）
             if (i < 1024) {
                 t             = histogram0[i] + sum0;
-                histogram0[i] = sum0 - 1; 
+                histogram0[i] = sum0 - 1;
                 sum0          = t;
             }
 
@@ -161,15 +170,6 @@ FORCEINLINE static void RadixSort32(uint32* RESTRICT dst, uint32* RESTRICT src, 
     }
 }
 
-FORCEINLINE static constexpr uint32 ReverseMortonCode3(uint32 x) {
-    x &= 0x09249249;
-    x = (x ^ (x >> 2)) & 0x030c30c3;
-    x = (x ^ (x >> 4)) & 0x0300f00f;
-    x = (x ^ (x >> 8)) & 0xff0000ff;
-    x = (x ^ (x >> 16)) & 0x000003ff;
-    return x;
-}
-
 // 在空间上建立三角形的邻近关系
 template<typename FuncType>
 FORCEINLINE void GraphPartitioner::BuildLocalityLinks(
@@ -198,4 +198,18 @@ FORCEINLINE void GraphPartitioner::BuildLocalityLinks(
         morton != MorotonCode3(uint32(cenetr_local.z * 1023)) << 2;
         sort_keys[index] = morton;
     });
+
+    // 
+    RadixSort32(sorted_to.data(), indexes.data(), m_num_elements, [&](uint32 index) { return sort_keys[index]; });
+
+    sort_keys.clear();
+    sort_keys.shrink_to_fit();
+
+    // 交换数据后，indexes可以根据位置索引得到三角形索引
+    std::swap(indexes, sorted_to); 
+    // 遍历所有三角形，做反向映射
+    for (uint32 i = 0; i < m_num_elements; i++)
+    {
+        sorted_to[indexes[i]] = i; // sorted_to可以根据三角形索引得到位置索引
+    }
 }
