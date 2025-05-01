@@ -182,7 +182,7 @@ FORCEINLINE void GraphPartitioner::BuildLocalityLinks(
     sort_keys.reserve(num_elements);
     sorted_to.reserve(num_elements);
 
-    const bool enable_element_groups = !group_indexes.empty();
+    const bool enable_groups = !group_indexes.empty();
 
     ParallelFor("BuildLocalityLinks.ParallelFor", num_elements, 4096, [&](uint32 index) {
         Vector3f center = GetCenter(index);
@@ -243,6 +243,77 @@ FORCEINLINE void GraphPartitioner::BuildLocalityLinks(
         // 完成最后一个range的end更新
         for (uint32 j = range_begin; j < num_elements, j++) {
             island_ranges[j].end = num_elements - 1;
+        }
+    }
+
+    // 遍历所有三角形，此时三角形索引是按照莫顿码排序后的indexes
+    for (uint32 i = 0; i < num_elements; i++) {
+        uint32_t index = indexes[i];
+
+        // 若该三角形属于小于128个三角形的独立拓扑结构
+        uint32 range_size = island_ranges[i].end - island_ranges[i].begin + 1;
+        if (range_size < 128) {
+            uint32 island_id = disjoint_set[index];
+            int32  group_id  = enable_groups ? group_indexes[index] : 0;
+
+            Vector3f center = GetCenter(index);
+
+            const uint32 max_links = 5;
+
+            // 初始化
+            uint32 closest_index[max_links];
+            float  closest_dist2[max_links];
+            for (int32 k = 0; k < max_links; k++) {
+                closest_index[k] = ~0u;
+                closest_dist2[k] = std::numeric_limits<float>::max();
+            }
+
+            // 向前和向后搜索邻接adj的island
+            for (int direction = 0; direction < 2; direction++) {
+                // 向前不能超过0，向后不能超过size-1
+                uint32 limit = direction ? num_elements - 1 : 0;
+                uint32 step  = direction ? 1 : -1;
+
+                uint32 adj = i;
+                // 最多搜索16步
+                for (int32 it = 0; it < 16; it++) {
+                    if (adj == limit) break;
+                    adj += step;
+
+                    uint32 adj_index = indexes[adj];
+                    uint32 adj_island_id = disjoint_set[adj_index]; // 获取邻接三角形所属的island
+
+                    int32 adj_group_id = enable_groups ? group_indexes[adj_index] : 0;
+
+                    // island相同 或者 group不匹配 则跳过整个区间
+                    if (island_id == adj_island_id || (group_id != adj_group_id))
+                    {
+                        if (direction)
+                            adj = island_ranges[adj].end;
+                        else
+                            adj = island_ranges[adj].begin;
+                    }
+                    else {
+                        // 计算二者的距离，按最短距离优先存入数组，记录索引
+                        float adj_dist2 = center.distance2(GetCenter(adj_index));
+                        for (int k = 0; k < max_links; k++) {
+                            // 维护最多5个元素的最近邻居数组
+                            if (adj_dist2 < closest_dist2[k]) {
+                                std::swap(adj_dist2, closest_dist2[k]);
+                                std::swap(adj_index, closest_index[k]);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 存储其局部连接性
+            for (int k = 0; k < max_links; k++) {
+                if (closest_index[k] != ~0u) {
+                    locality_links.emplace(index, closest_index[k]);
+                    locality_links.emplace(closest_index[k], index);
+                }
+            }
         }
     }
 
