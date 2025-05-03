@@ -27,6 +27,9 @@
     <ClCompile Include="Source\GraphPartitioner.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Source\MeshLoader.h">
+      <Filter>头文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Cluster.h">
@@ -76,6 +79,5 @@
     <None Include="README.md" />
     <None Include=".gitignore" />
     <None Include=".clang-format" />
-    <None Include="cpp.hint" />
   </ItemGroup>
 </Project>

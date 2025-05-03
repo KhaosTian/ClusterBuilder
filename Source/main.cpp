@@ -14,25 +14,25 @@ struct MeshBuildVertexView {
 
 static void ClusterTriangles(
     MeshBuildVertexView&       verts,
-    const std::vector<uint32>& indexes,
+    const std::vector<uint32>& indices,
     const std::vector<int32>&  material_indexes,
     std::vector<Cluster>&      clusters,
     const Bounds3f&            mesh_bounds
 ) {
-    uint32 num_triangles = static_cast<uint32>(indexes.size() / 3);
+    uint32 num_triangles = static_cast<uint32>(indices.size() / 3);
 
-    Adjacency adjacency { indexes.size() };
-    EdgeHash  edge_hash { indexes.size() };
+    Adjacency adjacency { indices.size() };
+    EdgeHash  edge_hash { indices.size() };
 
-    auto GetPosition = [&verts, &indexes](uint32 edge_index) { return verts.Positions[indexes[edge_index]]; };
+    auto GetPosition = [&verts, &indices](uint32 edge_index) { return verts.Positions[indices[edge_index]]; };
 
     // 将每个索引视作一条边，构建边的哈希表
-    ParallelFor("ClusterTriangles.ParalleFor", indexes.size(), 4096, [&](int edge_index) {
+    ParallelFor("ClusterTriangles.ParalleFor", indices.size(), 4096, [&](int edge_index) {
         edge_hash.AddConcurrent(edge_index, GetPosition);
     });
 
     // 将每个索引视作一条边，确定边的邻接关系
-    ParallelFor("ClusterTriangles.ParalleFor", indexes.size(), 1024, [&](int32 edge_index) {
+    ParallelFor("ClusterTriangles.ParalleFor", indices.size(), 1024, [&](int32 edge_index) {
         int32 adj_index = -1; // -1表示没有邻接边
         int32 adj_count = 0;
 
@@ -51,7 +51,7 @@ static void ClusterTriangles(
     DisjointSet disjoint_set(num_triangles);
 
     // 遍历所有边，最终得到若干个互不连通的拓扑结构
-    for (uint32 edge_index = 0, num = static_cast<uint32>(indexes.size()); edge_index < num; edge_index++) {
+    for (uint32 edge_index = 0, num = static_cast<uint32>(indices.size()); edge_index < num; edge_index++) {
         // 处理复杂边
         if (adjacency.direct[edge_index] == -2) {
             std::vector<std::pair<int32, int32>> edges;
@@ -83,11 +83,11 @@ static void ClusterTriangles(
     GraphPartitioner partitioner(num_triangles, Cluster::ClusterSize - 4, Cluster::ClusterSize);
     {
         // 获取三角形的中心坐标
-        auto GetCenter = [&verts, &indexes](uint32 tri_index) {
+        auto GetCenter = [&verts, &indices](uint32 tri_index) {
             Point3f center;
-            center = verts.Positions[indexes[tri_index * 3 + 0]];
-            center += verts.Positions[indexes[tri_index * 3 + 1]];
-            center += verts.Positions[indexes[tri_index * 3 + 2]];
+            center = verts.Positions[indices[tri_index * 3 + 0]];
+            center += verts.Positions[indices[tri_index * 3 + 1]];
+            center += verts.Positions[indices[tri_index * 3 + 2]];
             return center * (1.0f / 3.0f);
         };
 
@@ -100,7 +100,7 @@ static void ClusterTriangles(
         // 遍历每个三角形
         for (uint32 i = 0; i < num_triangles; i++) {
             graph->adjacency_offset[i] = graph->adjacency.size(); // 设置邻接表偏移量
-            uint32 tri_index           = partitioner.indexes[i]; // 获取三角形索引
+            uint32 tri_index           = partitioner.indices[i]; // 获取三角形索引
             // 遍历三角形的三个边
             for (int k = 0; k < 3; k++) {
                 // 遍历边的所有邻接边

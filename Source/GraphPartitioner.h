@@ -22,7 +22,7 @@ public:
     };
 
     std::vector<Range>  ranges;
-    std::vector<uint32> indexes;
+    std::vector<uint32> indices;
     std::vector<uint32> sorted_to;
 
 public:
@@ -36,7 +36,7 @@ public:
     void BuildLocalityLinks(
         DisjointSet&              disjoint_set,
         const Bounds3f&           bounds,
-        const std::vector<int32>& group_indexes,
+        const std::vector<int32>& group_indices,
         FuncType&                 GetCenter
     );
 
@@ -129,7 +129,7 @@ FORCEINLINE static void RadixSort32(uint32* RESTRICT dst, uint32* RESTRICT src, 
 
     // sort pass 1 对低10位排序
     {
-        const uint32* RESTRICT s = (const uint32* RESTRICT)src; // indexes，三角形索引数组
+        const uint32* RESTRICT s = (const uint32* RESTRICT)src; // indices，三角形索引数组
         uint32* RESTRICT       d = dst; // sorted_to，排序结果
         // 遍历三角形
         for (uint32 i = 0; i < num; i++) {
@@ -180,14 +180,14 @@ template<typename FuncType>
 FORCEINLINE void GraphPartitioner::BuildLocalityLinks(
     DisjointSet&              disjoint_set,
     const Bounds3f&           bounds,
-    const std::vector<int32>& group_indexes,
+    const std::vector<int32>& group_indices,
     FuncType&                 GetCenter
 ) {
     std::vector<uint32> sort_keys; // 存储每个三角形质心的莫顿码
     sort_keys.reserve(num_elements);
     sorted_to.reserve(num_elements);
 
-    const bool enable_groups = !group_indexes.empty();
+    const bool enable_groups = !group_indices.empty();
 
     ParallelFor("BuildLocalityLinks.ParallelFor",
                 num_elements,
@@ -207,17 +207,17 @@ FORCEINLINE void GraphPartitioner::BuildLocalityLinks(
                 });
 
     // 基数排序
-    RadixSort32(sorted_to.data(), indexes.data(), num_elements, [&](uint32 index) { return sort_keys[index]; });
+    RadixSort32(sorted_to.data(), indices.data(), num_elements, [&](uint32 index) { return sort_keys[index]; });
 
     // 清理sort_keys数组
     sort_keys.clear();
     sort_keys.shrink_to_fit();
 
-    // 交换数据后，indexes可以根据位置索引得到三角形索引
-    std::swap(indexes, sorted_to);
+    // 交换数据后，indices可以根据位置索引得到三角形索引
+    std::swap(indices, sorted_to);
     // 遍历所有三角形，做反向映射
     for (uint32 i = 0; i < num_elements; i++) {
-        sorted_to[indexes[i]] = i; // sorted_to可以根据三角形索引得到位置索引
+        sorted_to[indices[i]] = i; // sorted_to可以根据三角形索引得到位置索引
     }
 
     // 每个三角形都有一个range记录所属联通区域的起始和结束
@@ -231,7 +231,7 @@ FORCEINLINE void GraphPartitioner::BuildLocalityLinks(
         // 遍历所有三角形
         for (uint32 i = 0; i < num_elements; i++) {
             // 确定当前三角形所属的连通区域
-            uint32 range_id = disjoint_set.Find(indexes[i]);
+            uint32 range_id = disjoint_set.Find(indices[i]);
             if (curr_range != range_id) {
                 // 更新区域内所有range的end
                 for (uint32 j = range_begin; j < i; j++) {
@@ -252,15 +252,15 @@ FORCEINLINE void GraphPartitioner::BuildLocalityLinks(
         }
     }
 
-    // 遍历所有三角形，此时三角形索引是按照莫顿码排序后的indexes
+    // 遍历所有三角形，此时三角形索引是按照莫顿码排序后的indices
     for (uint32 i = 0; i < num_elements; i++) {
-        uint32_t index = indexes[i];
+        uint32_t index = indices[i];
 
         // 若该三角形属于小于128个三角形的独立拓扑结构
         uint32 range_size = island_ranges[i].end - island_ranges[i].begin + 1;
         if (range_size < 128) {
             uint32 island_id = disjoint_set[index];
-            int32  group_id  = enable_groups ? group_indexes[index] : 0;
+            int32  group_id  = enable_groups ? group_indices[index] : 0;
 
             Point3f center = GetCenter(index);
 
@@ -286,10 +286,10 @@ FORCEINLINE void GraphPartitioner::BuildLocalityLinks(
                     if (adj == limit) break;
                     adj += step;
 
-                    uint32 adj_index     = indexes[adj];
+                    uint32 adj_index     = indices[adj];
                     uint32 adj_island_id = disjoint_set[adj_index]; // 获取邻接三角形所属的island
 
-                    int32 adj_group_id = enable_groups ? group_indexes[adj_index] : 0;
+                    int32 adj_group_id = enable_groups ? group_indices[adj_index] : 0;
 
                     // island相同 或者 group不匹配 则跳过整个区间
                     if (island_id == adj_island_id || (group_id != adj_group_id)) {
